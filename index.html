@@ -794,6 +794,14 @@
         }
 
 
+        /* Dashboard workspace enhancement */
+        .dashboard-shortcuts{background:linear-gradient(135deg,#fff 0%,#f8faff 100%);border:1px solid var(--line);border-radius:16px;padding:20px;margin:0 0 18px;box-shadow:var(--shadow)}
+        .shortcut-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.shortcut-heading h3{font:800 16px Manrope;margin:3px 0}.shortcut-heading p{font-size:11px;color:var(--muted);margin:4px 0 0}.shortcut-eyebrow{font-size:9px;letter-spacing:1.4px;font-weight:800;color:var(--blue)}.shortcut-spark{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#edf1ff;color:#526de0;font-size:19px}
+        .shortcut-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.shortcut-card{border:1px solid transparent;border-radius:12px;padding:14px 12px;display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;min-width:0}.shortcut-card:hover{transform:translateY(-3px);box-shadow:0 9px 20px #1c2b4512;border-color:#dce3f4}.shortcut-card>span:nth-child(2){display:flex;flex-direction:column;gap:4px;min-width:0}.shortcut-card b{font-size:11px;color:#27334a}.shortcut-card small{font-size:9px;color:#77839a;white-space:normal}.shortcut-symbol{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:10px;font-size:17px;font-weight:800}.shortcut-arrow{margin-left:auto;color:#8793aa;font-size:15px}.shortcut-blue{background:#f0f4ff}.shortcut-blue .shortcut-symbol{background:#dfe8ff;color:#4164d9}.shortcut-violet{background:#f6f1ff}.shortcut-violet .shortcut-symbol{background:#e9ddff;color:#8156ce}.shortcut-teal{background:#edfaf7}.shortcut-teal .shortcut-symbol{background:#d5f2e9;color:#168b70}.shortcut-orange{background:#fff6ed}.shortcut-orange .shortcut-symbol{background:#ffe8d1;color:#d27b28}
+        .dashboard-insights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:0 0 19px}.insight-card{position:relative;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px 17px;box-shadow:var(--shadow)}.insight-label{font-size:9px;letter-spacing:.7px;font-weight:800;color:#8792a5}.insight-value{font:800 24px Manrope;color:#263653;margin:7px 0 2px}.insight-foot{font-size:10px;color:var(--muted)}.insight-icon{position:absolute;right:15px;top:15px;width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#f0f3ff;color:#5b73d9;font-size:17px}
+        @media(max-width:900px){.shortcut-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:600px){.dashboard-insights{grid-template-columns:1fr}.shortcut-grid{grid-template-columns:1fr 1fr}.shortcut-card{padding:12px 9px;gap:7px}.shortcut-card b{font-size:10px}.shortcut-card small{font-size:8px}}
+
         /* Dashboard welcome banner */
         .welcome-banner {
             position: relative;
@@ -859,6 +867,38 @@
         @media(max-width:600px) {
             .welcome-banner { align-items: flex-start; flex-direction: column; padding: 21px; }
             .welcome-date { white-space: normal; }
+        }
+
+        /* Animasi masuk setelah login */
+        @keyframes appReveal {
+            0% { opacity: 0; transform: translateY(18px) scale(.985); filter: blur(3px); }
+            65% { opacity: 1; filter: blur(0); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        @keyframes welcomeReveal {
+            0% { opacity: 0; transform: translateY(22px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes softPop {
+            0% { opacity: 0; transform: translateY(16px) scale(.97); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .app.login-enter .main { animation: appReveal .65s cubic-bezier(.2,.75,.25,1) both; }
+        .app.login-enter .sidebar { animation: welcomeReveal .55s ease-out both; }
+        .app.login-enter .welcome-banner { animation: welcomeReveal .7s .12s cubic-bezier(.2,.75,.25,1) both; }
+        .app.login-enter #dashCards .stat { animation: softPop .55s both; }
+        .app.login-enter #dashCards .stat:nth-child(1) { animation-delay: .20s; }
+        .app.login-enter #dashCards .stat:nth-child(2) { animation-delay: .29s; }
+        .app.login-enter #dashCards .stat:nth-child(3) { animation-delay: .38s; }
+        .app.login-enter #dashCards .stat:nth-child(4) { animation-delay: .47s; }
+        .app.login-enter #dashboard > .grid2,
+        .app.login-enter #dashboard > .panel { animation: softPop .6s .48s both; }
+        .welcome-banner { transition: transform .25s ease, box-shadow .25s ease; }
+        .welcome-banner:hover { transform: translateY(-2px); box-shadow: 0 16px 34px #4263eb30; }
+        @media (prefers-reduced-motion: reduce) {
+            .app.login-enter *, .app.login-enter *::before, .app.login-enter *::after {
+                animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important;
+            }
         }
 
         .login-screen {
@@ -1038,6 +1078,20 @@
                     <div class="welcome-date" id="welcomeDate"></div>
                 </div>
                 <div class="cards" id="dashCards"></div>
+                <div class="dashboard-shortcuts">
+                    <div class="shortcut-heading"><div><span class="shortcut-eyebrow">WORKSPACE</span><h3>Akses Cepat</h3><p>Pilih aktivitas untuk mulai bekerja.</p></div><span class="shortcut-spark">✦</span></div>
+                    <div class="shortcut-grid">
+                        <button class="shortcut-card shortcut-blue" onclick="showPage('sales')"><span class="shortcut-symbol">＋</span><span><b>Penjualan Baru</b><small>Catat transaksi harian</small></span><span class="shortcut-arrow">↗</span></button>
+                        <button class="shortcut-card shortcut-violet" onclick="openProduct()"><span class="shortcut-symbol">▦</span><span><b>Tambah Barang</b><small>Perbarui katalog produk</small></span><span class="shortcut-arrow">↗</span></button>
+                        <button class="shortcut-card shortcut-teal" onclick="showPage('opname')"><span class="shortcut-symbol">⌕</span><span><b>Stock Opname</b><small>Periksa stok persediaan</small></span><span class="shortcut-arrow">↗</span></button>
+                        <button class="shortcut-card shortcut-orange" onclick="showPage('logbook')"><span class="shortcut-symbol">☷</span><span><b>Logbook Harian</b><small>Catat kegiatan operasional</small></span><span class="shortcut-arrow">↗</span></button>
+                    </div>
+                </div>
+                <div class="dashboard-insights">
+                    <div class="insight-card"><div class="insight-label">TRANSAKSI HARI INI</div><div class="insight-value" id="dashTodayTransactions">0</div><div class="insight-foot">Jumlah transaksi penjualan</div><span class="insight-icon">⌁</span></div>
+                    <div class="insight-card"><div class="insight-label">UNIT TERJUAL HARI INI</div><div class="insight-value" id="dashTodayUnits">0</div><div class="insight-foot">Akumulasi kuantitas produk</div><span class="insight-icon">▤</span></div>
+                    <div class="insight-card"><div class="insight-label">PRODUK PERLU PERHATIAN</div><div class="insight-value" id="dashAttention">0</div><div class="insight-foot">Stok kosong atau menipis</div><span class="insight-icon">⚑</span></div>
+                </div>
                 <div class="grid2">
                     <div class="panel">
                         <div class="panel-head">
@@ -1343,9 +1397,16 @@
             $('mainApp').classList.add('locked');
             $('loginPassword').value = '';
         }
-        function enterApp() {
+        function enterApp(animate = false) {
             $('loginScreen').style.display = 'none';
             $('mainApp').classList.remove('locked');
+            $('mainApp').classList.remove('login-enter');
+            if (animate) {
+                // Reflow agar animasi dapat diputar setiap kali login berhasil.
+                void $('mainApp').offsetWidth;
+                $('mainApp').classList.add('login-enter');
+                window.setTimeout(() => $('mainApp').classList.remove('login-enter'), 1800);
+            }
         }
         function logout() {
             sessionStorage.removeItem('kdkmp_authenticated');
@@ -1360,7 +1421,7 @@
             if (username === LOGIN_USERNAME && password === LOGIN_PASSWORD) {
                 sessionStorage.setItem('kdkmp_authenticated', 'true');
                 $('loginError').classList.remove('show');
-                enterApp();
+                enterApp(true);
                 $('loginPassword').value = '';
             } else {
                 $('loginError').classList.add('show');
@@ -1923,6 +1984,14 @@
                 statCard('Estimasi Profit', rupiah(profit), '◈') +
                 statCard('Logbook Harian', db.logbooks.length, '✎') +
                 statCard('Jenis Barang', units, '▤');
+
+            const todayKey = today();
+            const todaySales = db.sales.filter(s => s.date === todayKey);
+            const todayUnits = todaySales.reduce((sum, sale) => sum + num(sale.qty), 0);
+            const attentionCount = db.products.filter(p => stockOf(p.id) <= num(p.minStock)).length;
+            $('dashTodayTransactions').textContent = todaySales.length.toLocaleString('id-ID');
+            $('dashTodayUnits').textContent = todayUnits.toLocaleString('id-ID');
+            $('dashAttention').textContent = attentionCount.toLocaleString('id-ID');
 
             let recent = db.sales.slice().reverse().slice(0, 5);
             $('recentSales').innerHTML = recent.length ? recent.map(s =>
