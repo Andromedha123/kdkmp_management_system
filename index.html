@@ -402,10 +402,34 @@
             color: #c94d57
         }
 
-        .pill.amber { background: #fff5e5; color: #ad741c }
-        .stock-warning-row { background: #fff0f1 !important; }
-        .stock-warning { display:inline-block; padding:4px 8px; border-radius:6px; background:#dc5b64; color:#fff; font-size:10px; font-weight:700; }
-        .stock-ok { display:inline-block; padding:4px 8px; border-radius:6px; background:#e8f7f1; color:#13825f; font-size:10px; font-weight:700; }
+        .pill.amber {
+            background: #fff5e5;
+            color: #ad741c
+        }
+
+        .stock-warning-row {
+            background: #fff0f1 !important;
+        }
+
+        .stock-warning {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #dc5b64;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .stock-ok {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #e8f7f1;
+            color: #13825f;
+            font-size: 10px;
+            font-weight: 700;
+        }
 
         .actions {
             display: flex;
@@ -497,10 +521,12 @@
             pointer-events: none;
             transition: opacity .2s ease, transform .2s ease;
         }
+
         .app-toast.show {
             opacity: 1;
             transform: translateY(0);
         }
+
         .app-toast .toast-icon {
             width: 30px;
             height: 30px;
@@ -512,10 +538,28 @@
             color: #b87516;
             font-weight: 800;
         }
-        .app-toast.success { border-color: #ccefe2; }
-        .app-toast.success .toast-icon { background: #e8f7f1; color: #13825f; }
-        .app-toast .toast-title { font-size: 12px; font-weight: 800; margin-bottom: 3px; }
-        .app-toast .toast-message { color: #68758b; font-size: 11px; line-height: 1.5; }
+
+        .app-toast.success {
+            border-color: #ccefe2;
+        }
+
+        .app-toast.success .toast-icon {
+            background: #e8f7f1;
+            color: #13825f;
+        }
+
+        .app-toast .toast-title {
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+
+        .app-toast .toast-message {
+            color: #68758b;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
         .app-toast .toast-close {
             margin-left: auto;
             padding: 0 2px;
@@ -524,6 +568,7 @@
             font-size: 18px;
             line-height: 1;
         }
+
         /* Dialog konfirmasi hapus */
         .modal.delete-confirm-modal {
             width: min(420px, 100%);
@@ -532,10 +577,19 @@
             text-align: center;
             animation: deleteModalIn .18s ease-out;
         }
+
         @keyframes deleteModalIn {
-            from { opacity: 0; transform: translateY(10px) scale(.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
+
         .delete-confirm-icon {
             width: 62px;
             height: 62px;
@@ -548,11 +602,13 @@
             font-size: 27px;
             box-shadow: inset 0 0 0 1px #ffdadd;
         }
+
         .delete-confirm-title {
             font: 800 18px Manrope;
             color: #172033;
             margin: 0 0 8px;
         }
+
         .delete-confirm-message {
             color: #596579;
             font-size: 13px;
@@ -560,6 +616,7 @@
             margin: 0 auto 14px;
             max-width: 330px;
         }
+
         .delete-confirm-detail {
             text-align: left;
             background: #fff8f0;
@@ -570,27 +627,33 @@
             font-size: 11px;
             line-height: 1.6;
         }
+
         .modal.delete-confirm-modal .modal-head {
             justify-content: center;
             margin-bottom: 0;
         }
+
         .modal.delete-confirm-modal .modal-head h3 {
             display: none;
         }
+
         .modal.delete-confirm-modal .modal-actions {
             justify-content: center;
             margin-top: 20px;
         }
+
         .modal.delete-confirm-modal .modal-actions .btn {
             min-width: 112px;
             padding: 11px 15px;
             border-radius: 9px;
         }
+
         .modal.delete-confirm-modal .modal-actions .btn.danger {
             background: #dc5b64;
             color: #fff;
             box-shadow: 0 5px 12px #dc5b6430;
         }
+
         .modal.delete-confirm-modal .modal-actions .btn.danger:hover {
             background: #c94752;
         }
@@ -865,15 +928,15 @@
         <aside class="sidebar">
             <div class="brand">
                 <div class="brand-mark">K</div>
-                <div><strong>KDKMP</strong><small>Inventory & Sales System</small></div>
+                <div><strong>KDKMP DapurKejambon</strong><small>Inventory & Sales System</small></div>
             </div>
             <div class="nav-label">OVERVIEW</div><button class="nav-btn active" data-page="dashboard"><span>▦</span><i
                     class="txt">Dashboard</i></button>
             <div class="nav-label">MASTER DATA</div><button class="nav-btn" data-page="barang"><span>▤</span><i
-                    class="txt">Master Data Barang</i></button><button class="nav-btn" data-page="supplier"><span>♙</span><i
-                    class="txt">Supplier &amp; Distributor</i></button><button class="nav-btn"
-                data-page="stockcard"><span>⇄</span><i class="txt">Stock Card</i></button><button class="nav-btn"
-                data-page="opname"><span>▣</span><i class="txt">Stock Opname</i></button>
+                    class="txt">Master Data Barang</i></button><button class="nav-btn"
+                data-page="supplier"><span>♙</span><i class="txt">Supplier &amp; Distributor</i></button><button
+                class="nav-btn" data-page="stockcard"><span>⇄</span><i class="txt">Stock Card</i></button><button
+                class="nav-btn" data-page="opname"><span>▣</span><i class="txt">Stock Opname</i></button>
             <div class="nav-label">PENGINPUTAN</div><button class="nav-btn" data-page="sales"><span>＋</span><i
                     class="txt">Penjualan Harian</i></button><button class="nav-btn" data-page="rekap"><span>▥</span><i
                     class="txt">Rekap Bulanan</i></button>
@@ -919,12 +982,14 @@
                     <div class="panel-head">
                         <div>
                             <h3>Top Product Performance</h3>
-                            <div class="sub" id="dashTopProductSubtitle">5 produk dengan omzet tertinggi pada bulan berjalan</div>
+                            <div class="sub" id="dashTopProductSubtitle">5 produk dengan omzet tertinggi pada bulan
+                                berjalan</div>
                         </div>
                         <button class="btn" onclick="showPage('rekap')">Lihat Rekap Bulanan</button>
                     </div>
                     <div class="table-wrap" id="dashTopProductPerformance"></div>
-                    <div class="footer-note">Peringkat berdasarkan revenue. Frekuensi transaksi menghitung jumlah nomor transaksi berbeda yang memuat produk.</div>
+                    <div class="footer-note">Peringkat berdasarkan revenue. Frekuensi transaksi menghitung jumlah nomor
+                        transaksi berbeda yang memuat produk.</div>
                 </div>
                 <div class="panel">
                     <div class="panel-head">
@@ -973,7 +1038,8 @@
                     </div>
                     <div class="toolbar">
                         <div class="search">
-                            <input id="supplierSearch" placeholder="Cari kode, nama perusahaan, sales, atau telepon..." oninput="renderSuppliers()">
+                            <input id="supplierSearch" placeholder="Cari kode, nama perusahaan, sales, atau telepon..."
+                                oninput="renderSuppliers()">
                         </div>
                         <div class="muted" id="supplierCount" style="font-size:12px;align-self:center"></div>
                     </div>
@@ -988,9 +1054,11 @@
                             <div class="sub">Mutasi stok masuk, keluar, dan saldo berjalan</div>
                         </div>
                         <div class="btnline"><button class="btn" onclick="downloadTemplate()">Template Excel</button>
-                                <button class="btn" onclick="$('importStockFile').click()">↑ Import Excel</button>
-                                <input id="importStockFile" type="file" accept=".xlsx,.xls,.csv" hidden onchange="importStockCard(event)">
-                                <button class="btn primary" onclick="openMovement()">＋ Input Mutasi</button></div>
+                            <button class="btn" onclick="$('importStockFile').click()">↑ Import Excel</button>
+                            <input id="importStockFile" type="file" accept=".xlsx,.xls,.csv" hidden
+                                onchange="importStockCard(event)">
+                            <button class="btn primary" onclick="openMovement()">＋ Input Mutasi</button>
+                        </div>
                     </div>
                     <div class="toolbar">
                         <div class="search"><input id="stockSearch" placeholder="Cari SKU atau nama produk..."
@@ -1009,9 +1077,11 @@
                             <div class="sub">Bandingkan stok sistem dengan hasil perhitungan fisik</div>
                         </div>
                         <div class="btnline"><button class="btn" onclick="downloadTemplate()">Template Excel</button>
-                                <button class="btn" onclick="$('importOpnameFile').click()">↑ Import Excel</button>
-                                <input id="importOpnameFile" type="file" accept=".xlsx,.xls,.csv" hidden onchange="importStockOpname(event)">
-                                <button class="btn primary" onclick="openOpname()">＋ Input Stock Opname</button></div>
+                            <button class="btn" onclick="$('importOpnameFile').click()">↑ Import Excel</button>
+                            <input id="importOpnameFile" type="file" accept=".xlsx,.xls,.csv" hidden
+                                onchange="importStockOpname(event)">
+                            <button class="btn primary" onclick="openOpname()">＋ Input Stock Opname</button>
+                        </div>
                     </div>
                     <div class="table-wrap" id="opnameTable"></div>
                 </div>
@@ -1067,7 +1137,8 @@
                             <button class="btn" onclick="setRecapPreset('year')">Tahun Ini</button>
                         </div>
                     </div>
-                    <div class="panel" style="padding:15px;margin-bottom:18px;box-shadow:none;background:#f8faff;border:1px solid #e4eaf3">
+                    <div class="panel"
+                        style="padding:15px;margin-bottom:18px;box-shadow:none;background:#f8faff;border:1px solid #e4eaf3">
                         <div class="formgrid" style="align-items:end">
                             <div class="formfield">
                                 <label for="recapPreset">Jenis Periode Laporan</label>
@@ -1097,7 +1168,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="sub" id="recapPeriodInfo" style="margin-top:10px">Pilih jenis periode atau tentukan tanggal mulai dan akhir.</div>
+                        <div class="sub" id="recapPeriodInfo" style="margin-top:10px">Pilih jenis periode atau tentukan
+                            tanggal mulai dan akhir.</div>
                     </div>
                     <div class="cards" id="recapCards"></div>
                     <div class="table-wrap" id="recapTable"></div>
@@ -1110,7 +1182,8 @@
                             <span class="pill">Top 5 Produk</span>
                         </div>
                         <div class="table-wrap" id="topProductPerformance"></div>
-                        <div class="footer-note">Frekuensi Transaksi menunjukkan jumlah nomor transaksi berbeda yang memuat produk tersebut. Aplikasi belum merekam aktivitas Add to Cart secara terpisah.</div>
+                        <div class="footer-note">Frekuensi Transaksi menunjukkan jumlah nomor transaksi berbeda yang
+                            memuat produk tersebut. Aplikasi belum merekam aktivitas Add to Cart secara terpisah.</div>
                     </div>
                 </div>
             </section>
@@ -1538,7 +1611,7 @@
                     <td class="right">${p.qty.toLocaleString('id-ID')}</td><td class="right"><b>${rupiah(p.revenue)}</b></td></tr>`).join('')}
                 </tbody></table>` : '<div class="empty">Belum ada data penjualan untuk ditampilkan.</div>';
         }
-        
+
         function statCard(label, val, ic) { return `<div class="stat"><div class="stat-top">${label}<span class="stat-icon">${ic}</span></div><div class="stat-value">${val}</div></div>` }
         function renderDashboard() {
             let total = db.sales.reduce((a, s) => a + num(s.total), 0);
@@ -1616,59 +1689,60 @@
         }
         function importExcel(e) { let f = e.target.files[0]; if (!f) return; let r = new FileReader(); r.onload = ev => { try { let wb = XLSX.read(ev.target.result, { type: 'array' }), ws = wb.Sheets[wb.SheetNames[0]], rows = XLSX.utils.sheet_to_json(ws, { defval: '' }); let added = 0; rows.forEach(x => { let sku = String(x['Kode SKU'] || x['SKU'] || '').trim(), name = String(x['Nama Produk'] || '').trim(); if (!sku || !name) return; let p = { id: uid(), sku, brand: String(x.Brand || ''), name, category: String(x.Kategori || ''), unit: String(x.Satuan || 'Pcs'), hpp: num(x.HPP), price: num(x['Harga Jual']), minStock: num(x['Stock Minimal'] ?? x['Stok Minimal'] ?? 0) }; let old = db.products.findIndex(y => y.sku.toLowerCase() === sku.toLowerCase()); if (old >= 0) { p.id = db.products[old].id; db.products[old] = p } else { db.products.push(p); added++ } }); save(); alert(`Import selesai. ${rows.length} baris dibaca, ${added} barang baru ditambahkan. SKU yang sudah ada diperbarui.`) } catch (err) { alert('Gagal membaca file. Pastikan menggunakan template Excel KDKMP.') } e.target.value = '' }; r.readAsArrayBuffer(f) }
         function parseImportDate(v) {
-            if (v instanceof Date) return v.toISOString().slice(0,10);
-            if (typeof v === 'number' && window.XLSX?.SSF) return XLSX.SSF.parse_date_code(v) ? `${XLSX.SSF.parse_date_code(v).y}-${String(XLSX.SSF.parse_date_code(v).m).padStart(2,'0')}-${String(XLSX.SSF.parse_date_code(v).d).padStart(2,'0')}` : today();
+            if (v instanceof Date) return v.toISOString().slice(0, 10);
+            if (typeof v === 'number' && window.XLSX?.SSF) return XLSX.SSF.parse_date_code(v) ? `${XLSX.SSF.parse_date_code(v).y}-${String(XLSX.SSF.parse_date_code(v).m).padStart(2, '0')}-${String(XLSX.SSF.parse_date_code(v).d).padStart(2, '0')}` : today();
             let t = String(v || '').trim();
             if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
-            if (/^\d{2}\/\d{2}\/\d{4}$/.test(t)) { let [d,m,y] = t.split('/'); return `${y}-${m}-${d}`; }
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(t)) { let [d, m, y] = t.split('/'); return `${y}-${m}-${d}`; }
             return t || today();
         }
         function readImportRows(file, callback, input) {
             if (!file) return;
-            if (!window.XLSX) { alert('Library Excel belum termuat.'); input.value=''; return; }
+            if (!window.XLSX) { alert('Library Excel belum termuat.'); input.value = ''; return; }
             let reader = new FileReader();
-            reader.onload = ev => { try {
-                let wb = XLSX.read(ev.target.result, {type:'array'});
-                let ws = wb.Sheets[wb.SheetNames[0]];
-                callback(XLSX.utils.sheet_to_json(ws, {defval:''}));
-            } catch(err) { alert('Gagal membaca file. Periksa format dan nama kolom pada template.'); }
-            input.value = '';
+            reader.onload = ev => {
+                try {
+                    let wb = XLSX.read(ev.target.result, { type: 'array' });
+                    let ws = wb.Sheets[wb.SheetNames[0]];
+                    callback(XLSX.utils.sheet_to_json(ws, { defval: '' }));
+                } catch (err) { alert('Gagal membaca file. Periksa format dan nama kolom pada template.'); }
+                input.value = '';
             };
             reader.readAsArrayBuffer(file);
         }
         function importStockCard(e) {
-            let input=e.target;
+            let input = e.target;
             readImportRows(input.files[0], rows => {
-                let count=0, skipped=0;
+                let count = 0, skipped = 0;
                 rows.forEach(r => {
-                    let sku=String(r['Kode SKU'] || r.SKU || '').trim();
-                    let p=db.products.find(x => x.sku.toLowerCase()===sku.toLowerCase());
-                    let inn=num(r['Barang Masuk'] ?? r.Masuk), out=num(r['Barang Keluar'] ?? r.Keluar);
+                    let sku = String(r['Kode SKU'] || r.SKU || '').trim();
+                    let p = db.products.find(x => x.sku.toLowerCase() === sku.toLowerCase());
+                    let inn = num(r['Barang Masuk'] ?? r.Masuk), out = num(r['Barang Keluar'] ?? r.Keluar);
                     if (!p || (!inn && !out) || (inn && out)) { skipped++; return; }
                     addMovement(p.id, parseImportDate(r.Tanggal), inn, out, String(r.Keterangan || 'Import Stock Card'));
                     count++;
                 });
-                if(count){ save(); }
+                if (count) { save(); }
                 alert(`Import Stock Card selesai. ${count} mutasi ditambahkan, ${skipped} baris dilewati. Pastikan Kode SKU sudah terdaftar di Master Data Barang.`);
             }, input);
         }
         function importStockOpname(e) {
-            let input=e.target;
+            let input = e.target;
             readImportRows(input.files[0], rows => {
-                let count=0, skipped=0;
+                let count = 0, skipped = 0;
                 rows.forEach(r => {
-                    let sku=String(r['Kode SKU'] || r.SKU || '').trim();
-                    let p=db.products.find(x => x.sku.toLowerCase()===sku.toLowerCase());
+                    let sku = String(r['Kode SKU'] || r.SKU || '').trim();
+                    let p = db.products.find(x => x.sku.toLowerCase() === sku.toLowerCase());
                     if (!p || r['Stock Fisik'] === '' || r['Stock Fisik'] == null) { skipped++; return; }
-                    let date=parseImportDate(r.Tanggal), system=stockOf(p.id), physical=num(r['Stock Fisik']), diff=physical-system;
-                    let condition=String(r['Kondisi Barang'] || 'Baik'), note=String(r['Tindakan/Catatan'] || r.Catatan || 'Import Stock Opname');
-                    let opnameId=uid();
-                    db.opnames.push({id:opnameId, productId:p.id, date, system, physical, diff, condition, note});
-                    if(diff>0) addMovement(p.id,date,diff,0,'Penyesuaian stock opname: '+note,'OPNAME:'+opnameId);
-                    if(diff<0) addMovement(p.id,date,0,-diff,'Penyesuaian stock opname: '+note,'OPNAME:'+opnameId);
+                    let date = parseImportDate(r.Tanggal), system = stockOf(p.id), physical = num(r['Stock Fisik']), diff = physical - system;
+                    let condition = String(r['Kondisi Barang'] || 'Baik'), note = String(r['Tindakan/Catatan'] || r.Catatan || 'Import Stock Opname');
+                    let opnameId = uid();
+                    db.opnames.push({ id: opnameId, productId: p.id, date, system, physical, diff, condition, note });
+                    if (diff > 0) addMovement(p.id, date, diff, 0, 'Penyesuaian stock opname: ' + note, 'OPNAME:' + opnameId);
+                    if (diff < 0) addMovement(p.id, date, 0, -diff, 'Penyesuaian stock opname: ' + note, 'OPNAME:' + opnameId);
                     count++;
                 });
-                if(count) save();
+                if (count) save();
                 alert(`Import Stock Opname selesai. ${count} data diproses, ${skipped} baris dilewati. Stock sistem diperbarui berdasarkan selisih.`);
             }, input);
         }
@@ -1690,9 +1764,11 @@
             }];
             const details = rows.map(s => {
                 const p = product(s.productId);
-                return { Tanggal: s.date, 'No. Transaksi': s.no, 'Kode SKU': p?.sku || '-',
+                return {
+                    Tanggal: s.date, 'No. Transaksi': s.no, 'Kode SKU': p?.sku || '-',
                     'Nama Barang': p?.name || 'Barang tidak ditemukan', Qty: num(s.qty),
-                    'Harga Satuan': num(s.price), 'Metode Pembayaran': s.method || '-', Total: num(s.total) };
+                    'Harga Satuan': num(s.price), 'Metode Pembayaran': s.method || '-', Total: num(s.total)
+                };
             });
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), 'Ringkasan');
@@ -1876,7 +1952,7 @@
 </style></head><body>
 <main class="report-content">
 <div class="header">
-  <div><div class="brand">KDKMP</div><div class="subtitle">INVENTORY &amp; SALES SYSTEM · LAPORAN MANAJEMEN</div><div class="report-tag">REKAP PENJUALAN BULANAN</div></div>
+  <div><div class="brand">KDKMP DapurKejambon</div><div class="subtitle">INVENTORY &amp; SALES SYSTEM · LAPORAN MANAJEMEN</div><div class="report-tag">REKAP PENJUALAN BULANAN</div></div>
   <div class="period"><b>PERIODE LAPORAN</b><br><strong style="font-size:15px;color:#fff">${escPdf(periodLabel)}</strong><br>Dicetak: ${escPdf(generatedAt)}</div>
 </div>
 <div class="section-kicker">Executive summary · Ringkasan kinerja</div>
