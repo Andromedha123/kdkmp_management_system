@@ -870,7 +870,8 @@
             <div class="nav-label">OVERVIEW</div><button class="nav-btn active" data-page="dashboard"><span>▦</span><i
                     class="txt">Dashboard</i></button>
             <div class="nav-label">MASTER DATA</div><button class="nav-btn" data-page="barang"><span>▤</span><i
-                    class="txt">Master Data Barang</i></button><button class="nav-btn"
+                    class="txt">Master Data Barang</i></button><button class="nav-btn" data-page="supplier"><span>♙</span><i
+                    class="txt">Supplier &amp; Distributor</i></button><button class="nav-btn"
                 data-page="stockcard"><span>⇄</span><i class="txt">Stock Card</i></button><button class="nav-btn"
                 data-page="opname"><span>▣</span><i class="txt">Stock Opname</i></button>
             <div class="nav-label">PENGINPUTAN</div><button class="nav-btn" data-page="sales"><span>＋</span><i
@@ -945,6 +946,27 @@
                                 class="btn" onclick="exportCSV()">Export CSV</button></div>
                     </div>
                     <div class="table-wrap" id="productTable"></div>
+                </div>
+            </section>
+            <section class="page" id="supplier">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h3>Supplier &amp; Distributor</h3>
+                            <div class="sub">Kelola data perusahaan, pemasok, kontak, dan syarat pembayaran</div>
+                        </div>
+                        <div class="btnline">
+                            <button class="btn" onclick="exportSuppliers()">↓ Export Excel</button>
+                            <button class="btn primary" onclick="openSupplier()">＋ Tambah Supplier</button>
+                        </div>
+                    </div>
+                    <div class="toolbar">
+                        <div class="search">
+                            <input id="supplierSearch" placeholder="Cari kode, nama perusahaan, sales, atau telepon..." oninput="renderSuppliers()">
+                        </div>
+                        <div class="muted" id="supplierCount" style="font-size:12px;align-self:center"></div>
+                    </div>
+                    <div class="table-wrap" id="supplierTable"></div>
                 </div>
             </section>
             <section class="page" id="stockcard">
@@ -1092,7 +1114,7 @@
         });
         if (isLoggedIn()) enterApp(); else showLogin();
 
-        let db = JSON.parse(localStorage.getItem('kdkmp_db') || 'null') || { products: [], movements: [], opnames: [], sales: [] }; db.logbooks ||= []; db.evaluations ||= []; db.devplans ||= [];
+        let db = JSON.parse(localStorage.getItem('kdkmp_db') || 'null') || { products: [], movements: [], opnames: [], sales: [] }; db.logbooks ||= []; db.evaluations ||= []; db.devplans ||= []; db.suppliers ||= [];
         function save() { localStorage.setItem('kdkmp_db', JSON.stringify(db)); renderAll() }
         function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
         function stockOf(id) { return db.movements.filter(m => m.productId === id).reduce((a, m) => a + num(m.in) - num(m.out), 0) }
@@ -1100,7 +1122,7 @@
         function margin(p) { return num(p.price) - num(p.hpp) }
         function marginPct(p) { return num(p.price) ? margin(p) / num(p.price) * 100 : 0 }
         function addMovement(productId, date, inn, out, desc, ref = '') { db.movements.push({ id: uid(), productId, date, in: num(inn), out: num(out), desc, ref }) }
-        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id)); document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === id)); $('pageTitle').textContent = ({ dashboard: 'Dashboard', barang: 'Master Data Barang', stockcard: 'Stock Card', opname: 'Stock Opname', sales: 'Penjualan Harian', logbook: 'Logbook & Evaluasi Harian', rekap: 'Rekap Bulanan' })[id]; if (id === 'dashboard') renderDashboard() }
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id)); document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === id)); $('pageTitle').textContent = ({ dashboard: 'Dashboard', barang: 'Master Data Barang', supplier: 'Supplier & Distributor', stockcard: 'Stock Card', opname: 'Stock Opname', sales: 'Penjualan Harian', logbook: 'Logbook & Evaluasi Harian', rekap: 'Rekap Bulanan' })[id]; if (id === 'dashboard') renderDashboard() }
         document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => showPage(b.dataset.page));
         function modal(title, body, saveLabel, fn) { $('modalTitle').textContent = title; $('modalBody').innerHTML = body; $('modalActions').innerHTML = '<button class="btn" onclick="closeModal()">Batal</button><button class="btn primary" id="modalSave">' + saveLabel + '</button>'; $('modal').classList.add('show'); $('modalSave').onclick = fn }
         function showDeleteConfirmation(message, detail, onConfirm) {
@@ -1145,6 +1167,120 @@
             }).join('')}</tbody></table>` : '<div class="empty">Belum ada data barang. Tambahkan barang atau import file Excel.</div>';
         }
         function deleteProduct(id) { if (!confirm('Hapus barang ini? Riwayat transaksi tetap tersimpan.')) return; db.products = db.products.filter(p => p.id !== id); save() }
+        function openSupplier(id = '') {
+            const s = id ? db.suppliers.find(x => x.id === id) : {
+                code: '', company: '', contact: '', phone: '', address: '', paymentTerms: ''
+            };
+            if (!s) return;
+            modal(id ? 'Edit Supplier / Distributor' : 'Tambah Supplier / Distributor', `
+                <div class="formgrid">
+                    ${field('Kode Supplier', 'spCode', s.code)}
+                    ${field('Nama Perusahaan / Supplier', 'spCompany', s.company)}
+                    ${field('Sales / Contact Person', 'spContact', s.contact)}
+                    ${field('No. Telepon', 'spPhone', s.phone, 'tel')}
+                    <div class="formfield full">
+                        <label>Alamat</label>
+                        <textarea id="spAddress" rows="3" placeholder="Masukkan alamat lengkap">${esc(s.address)}</textarea>
+                    </div>
+                    <div class="formfield full">
+                        <label>Syarat Bayar</label>
+                        <input id="spPaymentTerms" type="text" value="${esc(s.paymentTerms)}" placeholder="Contoh: Cash, COD, 7 hari, 14 hari, 30 hari">
+                        <div class="sub">Diisi manual sesuai kesepakatan dengan supplier.</div>
+                    </div>
+                </div>
+            `, 'Simpan Supplier', () => {
+                const code = $('spCode').value.trim();
+                const company = $('spCompany').value.trim();
+                if (!code || !company) {
+                    showToast('Kode Supplier dan Nama Perusahaan / Supplier wajib diisi.', 'info', 'Data belum lengkap');
+                    return;
+                }
+                const duplicate = db.suppliers.some(x =>
+                    String(x.code).toLowerCase() === code.toLowerCase() && x.id !== id
+                );
+                if (duplicate) {
+                    showToast('Kode Supplier sudah digunakan. Gunakan kode yang berbeda.', 'info', 'Kode supplier duplikat');
+                    return;
+                }
+                const record = {
+                    id: id || uid(),
+                    code,
+                    company,
+                    contact: $('spContact').value.trim(),
+                    phone: $('spPhone').value.trim(),
+                    address: $('spAddress').value.trim(),
+                    paymentTerms: $('spPaymentTerms').value.trim()
+                };
+                if (id) {
+                    const index = db.suppliers.findIndex(x => x.id === id);
+                    if (index >= 0) db.suppliers[index] = record;
+                } else {
+                    db.suppliers.push(record);
+                }
+                save();
+                closeModal();
+                showToast('Data supplier berhasil disimpan.', 'success', 'Berhasil disimpan');
+            });
+        }
+
+        function renderSuppliers() {
+            const q = ($('supplierSearch')?.value || '').toLowerCase().trim();
+            const rows = db.suppliers.filter(s =>
+                [s.code, s.company, s.contact, s.phone, s.address, s.paymentTerms]
+                    .some(v => String(v || '').toLowerCase().includes(q))
+            );
+            $('supplierCount').textContent = `${rows.length} dari ${db.suppliers.length} supplier`;
+            $('supplierTable').innerHTML = rows.length ? `
+                <table>
+                    <thead><tr>
+                        <th>Kode Supplier</th><th>Nama Perusahaan / Supplier</th>
+                        <th>Sales / Contact Person</th><th>No. Telepon</th>
+                        <th>Alamat</th><th>Syarat Bayar</th><th>Aksi</th>
+                    </tr></thead>
+                    <tbody>${rows.map(s => `
+                        <tr>
+                            <td><b>${esc(s.code)}</b></td>
+                            <td><b>${esc(s.company)}</b></td>
+                            <td>${esc(s.contact || '—')}</td>
+                            <td>${esc(s.phone || '—')}</td>
+                            <td style="white-space:normal;min-width:190px;max-width:280px">${esc(s.address || '—')}</td>
+                            <td><span class="pill">${esc(s.paymentTerms || 'Belum diisi')}</span></td>
+                            <td><div class="actions">
+                                <button class="action" onclick="openSupplier('${s.id}')">Edit</button>
+                                <button class="action" onclick="deleteSupplier('${s.id}')">Hapus</button>
+                            </div></td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>` : '<div class="empty">Belum ada data supplier. Klik Tambah Supplier untuk mulai mengisi.</div>';
+        }
+
+        function deleteSupplier(id) {
+            const s = db.suppliers.find(x => x.id === id);
+            if (!s) return;
+            showDeleteConfirmation(
+                `Anda akan menghapus data supplier ${s.company} (${s.code}).`,
+                'Data supplier akan dihapus dari Master Supplier & Distributor. Tindakan ini tidak dapat dibatalkan.',
+                () => {
+                    db.suppliers = db.suppliers.filter(x => x.id !== id);
+                    save();
+                    showToast('Data supplier berhasil dihapus.', 'success', 'Berhasil dihapus');
+                }
+            );
+        }
+
+        function exportSuppliers() {
+            const rows = db.suppliers.map(s => ({
+                'Kode Supplier': s.code,
+                'Nama Perusahaan / Supplier': s.company,
+                'Sales / Contact Person': s.contact,
+                'No. Telepon': s.phone,
+                'Alamat': s.address,
+                'Syarat Bayar': s.paymentTerms
+            }));
+            if (!rows.length) return showToast('Belum ada data supplier untuk diekspor.', 'info', 'Data kosong');
+            exportRows(rows, 'Master_Supplier_Distributor.xlsx', 'Supplier');
+        }
+
         function openMovement() { let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join(''); if (!opts) return alert('Tambahkan master barang terlebih dahulu.'); modal('Input Mutasi Stok', `<div class="formgrid">${selectRaw('Barang', 'mProduct', opts)}${field('Tanggal', 'mDate', today(), 'date')}${field('Barang Masuk (Qty)', 'mIn', 0, 'number', 'min="0"')}${field('Barang Keluar (Qty)', 'mOut', 0, 'number', 'min="0"')}<div class="formfield full"><label>Keterangan</label><input id="mDesc" placeholder="Pembelian, koreksi, retur, dll"></div></div>`, 'Simpan', () => { let a = num($('mIn').value), b = num($('mOut').value); if (a && b) return alert('Isi barang masuk atau barang keluar, bukan keduanya sekaligus.'); addMovement($('mProduct').value, $('mDate').value, a, b, $('mDesc').value || 'Mutasi manual'); save(); closeModal() }) }
         function selectRaw(label, id, options) { return `<div class="formfield"><label>${label}</label><select id="${id}">${options}</select></div>` }
         function renderStock() {
@@ -1238,7 +1374,7 @@
         function statCard(label, val, ic) { return `<div class="stat"><div class="stat-top">${label}<span class="stat-icon">${ic}</span></div><div class="stat-value">${val}</div></div>` }
         function renderDashboard() { let total = db.sales.reduce((a, s) => a + s.total, 0), profit = db.sales.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0), units = db.products.length; $('dashCards').innerHTML = statCard('Total Omzet', rupiah(total), '↗') + statCard('Estimasi Profit', rupiah(profit), '◈') + statCard('Logbook Harian', db.logbooks.length, '✎') + statCard('Jenis Barang', units, '▤'); let recent = db.sales.slice().reverse().slice(0, 5); $('recentSales').innerHTML = recent.length ? recent.map(s => `<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px"><div><b>${esc(s.no)}</b><div class="muted">${s.date} · ${esc(product(s.productId)?.name || '-')}</div></div><b>${rupiah(s.total)}</b></div>`).join('') : '<div class="empty">Belum ada transaksi.</div>'; let low = db.products.filter(p => stockOf(p.id) <= num(p.minStock)); $('lowStock').innerHTML = low.length ? `<table><thead><tr><th>SKU</th><th>Produk</th><th>Stok</th><th>Stock Minimal</th><th>Status</th></tr></thead><tbody>${low.map(p => `<tr><td>${p.sku}</td><td>${p.name}</td><td>${stockOf(p.id)} ${p.unit}</td><td>${num(p.minStock)} ${p.unit}</td><td><span class="stock-warning">⚠ Stok Menipis</span></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Tidak ada barang dengan stok rendah.</div>'; drawChart() }
         let chart; function drawChart() { let c = $('salesChart'); if (!c || !window.Chart) return; let labels = [], data = []; for (let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(d.getDate() - i); let key = d.toISOString().slice(0, 10); labels.push(key.slice(5)); data.push(db.sales.filter(s => s.date === key).reduce((a, s) => a + s.total, 0)) } if (chart) chart.destroy(); chart = new Chart(c, { type: 'bar', data: { labels, datasets: [{ label: 'Omzet', data, borderRadius: 6, backgroundColor: '#6683f4' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => 'Rp ' + (v / 1000) + 'k' }, grid: { color: '#eff2f6' } }, x: { grid: { display: false } } } } }) }
-        function renderAll() { renderProducts(); renderStock(); renderOpnames(); renderSales(); renderLogbook(); renderRecap(); renderDashboard() }
+        function renderAll() { renderProducts(); renderSuppliers(); renderStock(); renderOpnames(); renderSales(); renderLogbook(); renderRecap(); renderDashboard() }
         function downloadTemplate() {
             if (!window.XLSX) return alert('Library Excel belum termuat. Periksa koneksi internet.'); let wb = XLSX.utils.book_new(); let sheets = {
                 'Master Barang': [['Kode SKU', 'Brand', 'Nama Produk', 'Kategori', 'Satuan', 'HPP', 'Harga Jual', 'Stock Minimal'], ['SKU001', 'Bango', 'Bango Kecap Manis 950 GR', 'Makanan', 'Pcs', 36500, 45000, 5], ['SKU002', 'Bango', 'Bango Soy Sauce', 'Makanan', 'Pcs', 28000, 35000, 3]],
