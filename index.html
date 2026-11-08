@@ -475,6 +475,126 @@
             box-shadow: 0 20px 60px #0002
         }
 
+
+        /* Notifikasi ringan di dalam halaman, tanpa alert browser */
+        .app-toast {
+            position: fixed;
+            top: 22px;
+            right: 24px;
+            z-index: 120;
+            width: min(390px, calc(100vw - 32px));
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            padding: 14px 16px;
+            border: 1px solid #dce8ff;
+            border-radius: 13px;
+            background: #fff;
+            color: #26334a;
+            box-shadow: 0 14px 40px #17243a24;
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: opacity .2s ease, transform .2s ease;
+        }
+        .app-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .app-toast .toast-icon {
+            width: 30px;
+            height: 30px;
+            flex: 0 0 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: #fff4e5;
+            color: #b87516;
+            font-weight: 800;
+        }
+        .app-toast.success { border-color: #ccefe2; }
+        .app-toast.success .toast-icon { background: #e8f7f1; color: #13825f; }
+        .app-toast .toast-title { font-size: 12px; font-weight: 800; margin-bottom: 3px; }
+        .app-toast .toast-message { color: #68758b; font-size: 11px; line-height: 1.5; }
+        .app-toast .toast-close {
+            margin-left: auto;
+            padding: 0 2px;
+            background: transparent;
+            color: #8994a6;
+            font-size: 18px;
+            line-height: 1;
+        }
+        /* Dialog konfirmasi hapus */
+        .modal.delete-confirm-modal {
+            width: min(420px, 100%);
+            padding: 26px;
+            border-radius: 20px;
+            text-align: center;
+            animation: deleteModalIn .18s ease-out;
+        }
+        @keyframes deleteModalIn {
+            from { opacity: 0; transform: translateY(10px) scale(.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .delete-confirm-icon {
+            width: 62px;
+            height: 62px;
+            margin: 2px auto 16px;
+            border-radius: 20px;
+            display: grid;
+            place-items: center;
+            background: #fff0f1;
+            color: #dc5b64;
+            font-size: 27px;
+            box-shadow: inset 0 0 0 1px #ffdadd;
+        }
+        .delete-confirm-title {
+            font: 800 18px Manrope;
+            color: #172033;
+            margin: 0 0 8px;
+        }
+        .delete-confirm-message {
+            color: #596579;
+            font-size: 13px;
+            line-height: 1.65;
+            margin: 0 auto 14px;
+            max-width: 330px;
+        }
+        .delete-confirm-detail {
+            text-align: left;
+            background: #fff8f0;
+            border: 1px solid #ffead2;
+            color: #94601e;
+            border-radius: 11px;
+            padding: 11px 13px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+        .modal.delete-confirm-modal .modal-head {
+            justify-content: center;
+            margin-bottom: 0;
+        }
+        .modal.delete-confirm-modal .modal-head h3 {
+            display: none;
+        }
+        .modal.delete-confirm-modal .modal-actions {
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .modal.delete-confirm-modal .modal-actions .btn {
+            min-width: 112px;
+            padding: 11px 15px;
+            border-radius: 9px;
+        }
+        .modal.delete-confirm-modal .modal-actions .btn.danger {
+            background: #dc5b64;
+            color: #fff;
+            box-shadow: 0 5px 12px #dc5b6430;
+        }
+        .modal.delete-confirm-modal .modal-actions .btn.danger:hover {
+            background: #c94752;
+        }
+
         .modal-head {
             display: flex;
             justify-content: space-between;
@@ -916,6 +1036,14 @@
             </section>
         </main>
     </div>
+    <div id="appToast" class="app-toast" role="status" aria-live="polite">
+        <div class="toast-icon" id="toastIcon">!</div>
+        <div style="flex:1;min-width:0">
+            <div class="toast-title" id="toastTitle">Informasi</div>
+            <div class="toast-message" id="toastMessage"></div>
+        </div>
+        <button class="toast-close" type="button" onclick="hideToast()" aria-label="Tutup">×</button>
+    </div>
     <div class="modal-back" id="modal">
         <div class="modal">
             <div class="modal-head">
@@ -975,7 +1103,36 @@
         function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id)); document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === id)); $('pageTitle').textContent = ({ dashboard: 'Dashboard', barang: 'Master Data Barang', stockcard: 'Stock Card', opname: 'Stock Opname', sales: 'Penjualan Harian', logbook: 'Logbook & Evaluasi Harian', rekap: 'Rekap Bulanan' })[id]; if (id === 'dashboard') renderDashboard() }
         document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => showPage(b.dataset.page));
         function modal(title, body, saveLabel, fn) { $('modalTitle').textContent = title; $('modalBody').innerHTML = body; $('modalActions').innerHTML = '<button class="btn" onclick="closeModal()">Batal</button><button class="btn primary" id="modalSave">' + saveLabel + '</button>'; $('modal').classList.add('show'); $('modalSave').onclick = fn }
+        function showDeleteConfirmation(message, detail, onConfirm) {
+            modal('Konfirmasi Hapus', `
+                <div class="delete-confirm-icon" aria-hidden="true">⌫</div>
+                <div class="delete-confirm-title">Hapus data ini?</div>
+                <p class="delete-confirm-message">${esc(message)}</p>
+                <div class="delete-confirm-detail"><b>Perhatian</b><br>${esc(detail)}</div>
+            `, 'Ya, Hapus', () => {
+                closeModal();
+                onConfirm();
+            });
+            const dialog = $('modal').querySelector('.modal');
+            dialog.classList.add('delete-confirm-modal');
+            $('modalSave').className = 'btn danger';
+        }
         function closeModal() { $('modal').classList.remove('show') }
+
+        let toastTimer;
+        function showToast(message, type = 'info', title = '') {
+            const toast = $('appToast');
+            toast.className = 'app-toast show' + (type === 'success' ? ' success' : '');
+            $('toastIcon').textContent = type === 'success' ? '✓' : '!';
+            $('toastTitle').textContent = title || (type === 'success' ? 'Berhasil' : 'Informasi');
+            $('toastMessage').textContent = message;
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(hideToast, 4200);
+        }
+        function hideToast() {
+            const toast = $('appToast');
+            if (toast) toast.classList.remove('show');
+        }
         function field(label, id, value = '', type = 'text', extra = '') { return `<div class="formfield"><label>${label}</label><input id="${id}" type="${type}" value="${esc(value)}" ${extra}></div>` }
         function selectField(label, id, opts, value = '') { return `<div class="formfield"><label>${label}</label><select id="${id}">${opts.map(o => `<option ${o === value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>` }
         function openProduct(id = '') { let p = id ? product(id) : { sku: '', brand: '', name: '', category: '', unit: 'Pcs', hpp: 0, price: 0, minStock: 0 }; modal(id ? 'Edit Barang' : 'Tambah Barang', `<div class="formgrid">${field('Kode SKU', 'pSku', p.sku)}${field('Brand', 'pBrand', p.brand)}${field('Nama Produk', 'pName', p.name)}${field('Kategori', 'pCategory', p.category)}${field('Satuan', 'pUnit', p.unit)}${field('HPP (Rp)', 'pHpp', p.hpp, 'number', 'min="0"')} ${field('Harga Jual (Rp)', 'pPrice', p.price, 'number', 'min="0"')}${field('Stock Minimal', 'pMinStock', p.minStock ?? 0, 'number', 'min="0"')}<div class="formfield"><label>Margin (Rp)</label><input id="pMargin" disabled value="${rupiah(margin(p))}"></div><div class="formfield"><label>Persentase Margin</label><input id="pPct" disabled value="${marginPct(p).toFixed(2)}%"></div></div><div class="notice">Margin = Harga Jual − HPP. Persentase Margin = (Margin ÷ Harga Jual) × 100%. Persentase ini menggunakan harga jual sebagai dasar perhitungan.</div>`, 'Simpan', () => { let sku = $('pSku').value.trim(), name = $('pName').value.trim(); if (!sku || !name) return alert('Kode SKU dan Nama Produk wajib diisi.'); if (db.products.some(x => x.sku.toLowerCase() === sku.toLowerCase() && x.id !== id)) return alert('Kode SKU sudah digunakan.'); let obj = { id: id || uid(), sku, brand: $('pBrand').value.trim(), name, category: $('pCategory').value.trim(), unit: $('pUnit').value.trim() || 'Pcs', hpp: num($('pHpp').value), price: num($('pPrice').value), minStock: num($('pMinStock').value) }; if (id) db.products[db.products.findIndex(x => x.id === id)] = obj; else { db.products.push(obj); addMovement(obj.id, today(), 0, 0, 'Saldo awal (belum diisi)') } save(); closeModal() });['pHpp', 'pPrice'].forEach(k => setTimeout(() => $(k).oninput = () => { let h = num($('pHpp').value), s = num($('pPrice').value), m = s - h; $('pMargin').value = rupiah(m); $('pPct').value = (s ? m / s * 100 : 0).toFixed(2) + '%' }, 0)) }
@@ -990,12 +1147,78 @@
         function deleteProduct(id) { if (!confirm('Hapus barang ini? Riwayat transaksi tetap tersimpan.')) return; db.products = db.products.filter(p => p.id !== id); save() }
         function openMovement() { let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join(''); if (!opts) return alert('Tambahkan master barang terlebih dahulu.'); modal('Input Mutasi Stok', `<div class="formgrid">${selectRaw('Barang', 'mProduct', opts)}${field('Tanggal', 'mDate', today(), 'date')}${field('Barang Masuk (Qty)', 'mIn', 0, 'number', 'min="0"')}${field('Barang Keluar (Qty)', 'mOut', 0, 'number', 'min="0"')}<div class="formfield full"><label>Keterangan</label><input id="mDesc" placeholder="Pembelian, koreksi, retur, dll"></div></div>`, 'Simpan', () => { let a = num($('mIn').value), b = num($('mOut').value); if (a && b) return alert('Isi barang masuk atau barang keluar, bukan keduanya sekaligus.'); addMovement($('mProduct').value, $('mDate').value, a, b, $('mDesc').value || 'Mutasi manual'); save(); closeModal() }) }
         function selectRaw(label, id, options) { return `<div class="formfield"><label>${label}</label><select id="${id}">${options}</select></div>` }
-        function renderStock() { let q = ($('stockSearch')?.value || '').toLowerCase(), from = $('stockFrom')?.value || '', to = $('stockTo')?.value || '', rows = db.movements.filter(m => { let p = product(m.productId); return p && (p.sku + ' ' + p.name).toLowerCase().includes(q) && (!from || m.date >= from) && (!to || m.date <= to) }).sort((a, b) => a.date.localeCompare(b.date)); let running = {}; $('stockTable').innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>Kode SKU</th><th>Nama Produk</th><th>Stock Awal*</th><th>Barang Masuk</th><th>Barang Keluar</th><th>Stock Akhir*</th><th>Keterangan</th></tr></thead><tbody>${rows.map(m => { let p = product(m.productId), before = running[m.productId] || 0, after = before + m.in - m.out; running[m.productId] = after; return `<tr><td>${esc(m.date)}</td><td>${esc(p.sku)}</td><td>${esc(p.name)}</td><td>${before}</td><td class="positive">${m.in || '—'}</td><td class="negative">${m.out || '—'}</td><td><b>${after}</b></td><td>${esc(m.desc)}</td></tr>` }).join('')}</tbody></table><div class="footer-note">*Stock awal/akhir dihitung dari mutasi yang tampil sesuai filter tanggal. Mutasi transaksi penjualan dan opname tercatat otomatis.</div>` : '<div class="empty">Belum ada mutasi stok.</div>' }
-        function openOpname() { if (!db.products.length) return alert('Tambahkan master barang terlebih dahulu.'); let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join(''); modal('Input Stock Opname', `<div class="formgrid">${selectRaw('Barang', 'oProduct', opts)}${field('Tanggal', 'oDate', today(), 'date')}<div class="formfield"><label>Stock Sistem</label><input id="oSystem" disabled></div>${field('Stock Fisik', 'oPhysical', 0, 'number', 'min="0"')}${selectField('Kondisi Barang', 'oCondition', ['Baik', 'Rusak', 'Expired', 'Hilang', 'Lainnya'])}<div class="formfield"><label>Tindakan / Catatan</label><input id="oNote" placeholder="Catatan pemeriksaan"></div></div><div class="notice">Jika disimpan, selisih akan dibuat sebagai mutasi penyesuaian agar stok sistem sama dengan stok fisik.</div>`, 'Simpan Opname', () => { let id = $('oProduct').value, sys = stockOf(id), phy = num($('oPhysical').value), diff = phy - sys; db.opnames.push({ id: uid(), productId: id, date: $('oDate').value, system: sys, physical: phy, diff, condition: $('oCondition').value, note: $('oNote').value }); if (diff > 0) addMovement(id, $('oDate').value, diff, 0, 'Penyesuaian stock opname: ' + $('oNote').value); if (diff < 0) addMovement(id, $('oDate').value, 0, -diff, 'Penyesuaian stock opname: ' + $('oNote').value); save(); closeModal() }); setTimeout(() => { $('oProduct').onchange = () => $('oSystem').value = stockOf($('oProduct').value); $('oSystem').value = stockOf(db.products[0].id) }, 0) }
-        function renderOpnames() { $('opnameTable').innerHTML = db.opnames.length ? `<table><thead><tr><th>Tanggal</th><th>SKU</th><th>Nama Produk</th><th>Stock Sistem</th><th>Stock Fisik</th><th>Selisih</th><th>Kondisi</th><th>Tindakan/Catatan</th></tr></thead><tbody>${db.opnames.slice().reverse().map(o => { let p = product(o.productId); return `<tr><td>${esc(o.date)}</td><td>${esc(p?.sku || '-')}</td><td>${esc(p?.name || '-')}</td><td>${o.system}</td><td>${o.physical}</td><td class="${o.diff >= 0 ? 'positive' : 'negative'}">${o.diff > 0 ? '+' : ''}${o.diff}</td><td><span class="pill ${o.condition === 'Baik' ? 'green' : 'amber'}">${esc(o.condition)}</span></td><td>${esc(o.note)}</td></tr>` }).join('')}</tbody></table>` : '<div class="empty">Belum ada data stock opname.</div>' }
+        function renderStock() {
+            let q = ($('stockSearch')?.value || '').toLowerCase(), from = $('stockFrom')?.value || '', to = $('stockTo')?.value || '';
+            let rows = db.movements.filter(m => { let p = product(m.productId); return p && (p.sku + ' ' + p.name).toLowerCase().includes(q) && (!from || m.date >= from) && (!to || m.date <= to) }).sort((a, b) => a.date.localeCompare(b.date));
+            let running = {};
+            $('stockTable').innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>Kode SKU</th><th>Nama Produk</th><th>Stock Awal*</th><th>Barang Masuk</th><th>Barang Keluar</th><th>Stock Akhir*</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody>${rows.map(m => {
+                let p = product(m.productId), before = running[m.productId] || 0, after = before + m.in - m.out; running[m.productId] = after;
+                return `<tr><td>${esc(m.date)}</td><td>${esc(p.sku)}</td><td>${esc(p.name)}</td><td>${before}</td><td class="positive">${m.in || '—'}</td><td class="negative">${m.out || '—'}</td><td><b>${after}</b></td><td>${esc(m.desc)}</td><td><button class="action" onclick="deleteMovement('${m.id}')">Hapus</button></td></tr>`;
+            }).join('')}</tbody></table><div class="footer-note">*Stock awal/akhir dihitung dari mutasi yang tampil sesuai filter tanggal. Mutasi penjualan dan penyesuaian opname harus dihapus dari menu asalnya agar catatan tetap konsisten.</div>` : '<div class="empty">Belum ada mutasi stok.</div>';
+        }
+        function deleteMovement(id) {
+            let m = db.movements.find(x => x.id === id);
+            if (!m) return;
+            let linkedSale = db.sales.find(x => x.no === m.ref && m.ref && m.desc === 'Penjualan ' + x.no);
+            if (linkedSale) return showToast('Mutasi ini berasal dari transaksi penjualan. Hapus transaksi melalui menu Penjualan Harian agar stok dan laporan tetap konsisten.', 'info', 'Tidak dapat dihapus dari Stock Card');
+            if ((m.ref || '').startsWith('OPNAME:') || m.desc?.startsWith('Penyesuaian stock opname:')) return showToast('Mutasi ini berasal dari Stock Opname. Hapus data melalui menu Stock Opname agar catatan opname dan stok tetap konsisten.', 'info', 'Tidak dapat dihapus dari Stock Card');
+            showDeleteConfirmation(
+                'Anda akan menghapus satu riwayat mutasi stok.',
+                'Data mutasi ini akan dihapus permanen dan saldo stok barang akan dihitung ulang. Tindakan ini tidak dapat dibatalkan.',
+                () => {
+                    db.movements = db.movements.filter(x => x.id !== id);
+                    save();
+                    showToast('Riwayat mutasi stok berhasil dihapus.', 'success', 'Data berhasil dihapus');
+                }
+            );
+        }
+        function openOpname() { if (!db.products.length) return alert('Tambahkan master barang terlebih dahulu.'); let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join(''); modal('Input Stock Opname', `<div class="formgrid">${selectRaw('Barang', 'oProduct', opts)}${field('Tanggal', 'oDate', today(), 'date')}<div class="formfield"><label>Stock Sistem</label><input id="oSystem" disabled></div>${field('Stock Fisik', 'oPhysical', 0, 'number', 'min="0"')}${selectField('Kondisi Barang', 'oCondition', ['Baik', 'Rusak', 'Expired', 'Hilang', 'Lainnya'])}<div class="formfield"><label>Tindakan / Catatan</label><input id="oNote" placeholder="Catatan pemeriksaan"></div></div><div class="notice">Jika disimpan, selisih akan dibuat sebagai mutasi penyesuaian agar stok sistem sama dengan stok fisik.</div>`, 'Simpan Opname', () => { let id = $('oProduct').value, sys = stockOf(id), phy = num($('oPhysical').value), diff = phy - sys; let opnameId = uid(); db.opnames.push({ id: opnameId, productId: id, date: $('oDate').value, system: sys, physical: phy, diff, condition: $('oCondition').value, note: $('oNote').value }); if (diff > 0) addMovement(id, $('oDate').value, diff, 0, 'Penyesuaian stock opname: ' + $('oNote').value, 'OPNAME:' + opnameId); if (diff < 0) addMovement(id, $('oDate').value, 0, -diff, 'Penyesuaian stock opname: ' + $('oNote').value, 'OPNAME:' + opnameId); save(); closeModal() }); setTimeout(() => { $('oProduct').onchange = () => $('oSystem').value = stockOf($('oProduct').value); $('oSystem').value = stockOf(db.products[0].id) }, 0) }
+        function renderOpnames() {
+            $('opnameTable').innerHTML = db.opnames.length ? `<table><thead><tr><th>Tanggal</th><th>SKU</th><th>Nama Produk</th><th>Stock Sistem</th><th>Stock Fisik</th><th>Selisih</th><th>Kondisi</th><th>Tindakan/Catatan</th><th>Aksi</th></tr></thead><tbody>${db.opnames.slice().reverse().map(o => {
+                let p = product(o.productId);
+                return `<tr><td>${esc(o.date)}</td><td>${esc(p?.sku || '-')}</td><td>${esc(p?.name || '-')}</td><td>${o.system}</td><td>${o.physical}</td><td class="${o.diff >= 0 ? 'positive' : 'negative'}">${o.diff > 0 ? '+' : ''}${o.diff}</td><td><span class="pill ${o.condition === 'Baik' ? 'green' : 'amber'}">${esc(o.condition)}</span></td><td>${esc(o.note)}</td><td><button class="action" onclick="deleteOpname('${o.id}')">Hapus</button></td></tr>`;
+            }).join('')}</tbody></table>` : '<div class="empty">Belum ada data stock opname.</div>';
+        }
+        function deleteOpname(id) {
+            let o = db.opnames.find(x => x.id === id);
+            if (!o) return;
+            showDeleteConfirmation(
+                'Anda akan menghapus catatan Stock Opname untuk barang ' + (product(o.productId)?.name || 'ini') + '.',
+                'Mutasi penyesuaian stok yang terkait juga akan dihapus. Saldo stok akan dihitung ulang setelah penghapusan.',
+                () => {
+                    let linked = db.movements.filter(m => m.ref === 'OPNAME:' + id);
+                    if (!linked.length && o.diff !== 0) {
+                        // Dukungan untuk data opname lama sebelum setiap mutasi memiliki ID referensi.
+                        let legacy = db.movements.find(m => m.productId === o.productId && m.date === o.date &&
+                            m.desc === 'Penyesuaian stock opname: ' + (o.note || '') &&
+                            (o.diff > 0 ? num(m.in) === num(o.diff) && !num(m.out) : num(m.out) === Math.abs(num(o.diff)) && !num(m.in)));
+                        if (legacy) linked = [legacy];
+                    }
+                    const linkedIds = new Set(linked.map(m => m.id));
+                    db.movements = db.movements.filter(m => !linkedIds.has(m.id));
+                    db.opnames = db.opnames.filter(x => x.id !== id);
+                    save();
+                    showToast('Data Stock Opname dan penyesuaian stok terkait berhasil dihapus.', 'success', 'Data berhasil dihapus');
+                }
+            );
+        }
         function openSale() { if (!db.products.length) return alert('Tambahkan master barang terlebih dahulu.'); let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)} (${rupiah(p.price)})</option>`).join(''); modal('Input Penjualan Harian', `<div class="formgrid">${field('Tanggal', 'sDate', today(), 'date')}${field('No. Transaksi', 'sNo', 'TRX-' + Date.now().toString().slice(-6))}${selectRaw('Nama Barang', 'sProduct', opts)}${field('QTY', 'sQty', 1, 'number', 'min="1"')}${field('Harga Satuan (otomatis)', 'sPrice', db.products[0].price, 'number', 'min="0"')}${field('Total', 'sTotal', rupiah(db.products[0].price))}${selectField('Metode Bayar', 'sMethod', ['Tunai', 'QRIS', 'Transfer', 'Debit', 'Kredit'])}</div><div class="notice">Harga satuan otomatis mengikuti Harga Jual di Master Data Barang.</div>`, 'Simpan Transaksi', () => { let p = product($('sProduct').value), qty = num($('sQty').value); if (!p || qty <= 0) return alert('Pilih barang dan isi QTY lebih dari 0.'); if (stockOf(p.id) < qty && !confirm('Stok sistem kurang dari jumlah penjualan. Tetap simpan?')) return; let sale = { id: uid(), date: $('sDate').value, no: $('sNo').value, productId: p.id, qty, price: num($('sPrice').value), total: qty * num($('sPrice').value), method: $('sMethod').value }; db.sales.push(sale); addMovement(p.id, sale.date, 0, qty, 'Penjualan ' + sale.no, sale.no); save(); closeModal() }); setTimeout(() => { let update = () => { let p = product($('sProduct').value); $('sPrice').value = p?.price || 0; $('sTotal').value = rupiah(num($('sQty').value) * num($('sPrice').value)) }; $('sProduct').onchange = update; $('sQty').oninput = update; $('sPrice').oninput = update }, 0) }
         function renderSales() { let q = ($('saleSearch')?.value || '').toLowerCase(), d = $('saleDate')?.value || '', rows = db.sales.filter(s => { let p = product(s.productId); return (s.no + ' ' + (p?.name || '')).toLowerCase().includes(q) && (!d || s.date === d) }).slice().reverse(); $('salesTable').innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>No. Trx</th><th>Nama Barang</th><th>QTY</th><th>Harga Satuan</th><th>Total</th><th>Metode Bayar</th><th>Aksi</th></tr></thead><tbody>${rows.map(s => { let p = product(s.productId); return `<tr><td>${s.date}</td><td><b>${esc(s.no)}</b></td><td>${esc(p?.name || 'Barang dihapus')}</td><td>${s.qty}</td><td>${rupiah(s.price)}</td><td><b>${rupiah(s.total)}</b></td><td><span class="pill ${s.method === 'Tunai' ? 'green' : s.method === 'Bon' ? 'amber' : ''}">${esc(s.method)}</span></td><td><button class="action" onclick="deleteSale('${s.id}')">Hapus</button></td></tr>` }).join('')}</tbody></table>` : '<div class="empty">Belum ada transaksi penjualan.</div>' }
-        function deleteSale(id) { let s = db.sales.find(x => x.id === id); if (!s || !confirm('Hapus transaksi ini? Stok akan dikembalikan.')) return; db.sales = db.sales.filter(x => x.id !== id); let m = db.movements.find(x => x.ref === s.no && x.desc === 'Penjualan ' + s.no); if (m) db.movements = db.movements.filter(x => x.id !== m.id); save() }
+        function deleteSale(id) {
+            let s = db.sales.find(x => x.id === id);
+            if (!s) return;
+            showDeleteConfirmation(
+                'Anda akan menghapus transaksi penjualan ' + s.no + '.',
+                'Mutasi barang keluar yang terkait juga akan dihapus sehingga stok barang dikembalikan. Laporan penjualan akan diperbarui.',
+                () => {
+                    db.sales = db.sales.filter(x => x.id !== id);
+                    let m = db.movements.find(x => x.ref === s.no && x.desc === 'Penjualan ' + s.no);
+                    if (m) db.movements = db.movements.filter(x => x.id !== m.id);
+                    save();
+                    showToast('Transaksi dan mutasi stok terkait berhasil dihapus.', 'success', 'Data berhasil dihapus');
+                }
+            );
+        }
 
         let logTab = 'log';
         const logConfig = {
@@ -1075,9 +1298,10 @@
                     if (!p || r['Stock Fisik'] === '' || r['Stock Fisik'] == null) { skipped++; return; }
                     let date=parseImportDate(r.Tanggal), system=stockOf(p.id), physical=num(r['Stock Fisik']), diff=physical-system;
                     let condition=String(r['Kondisi Barang'] || 'Baik'), note=String(r['Tindakan/Catatan'] || r.Catatan || 'Import Stock Opname');
-                    db.opnames.push({id:uid(), productId:p.id, date, system, physical, diff, condition, note});
-                    if(diff>0) addMovement(p.id,date,diff,0,'Penyesuaian stock opname: '+note);
-                    if(diff<0) addMovement(p.id,date,0,-diff,'Penyesuaian stock opname: '+note);
+                    let opnameId=uid();
+                    db.opnames.push({id:opnameId, productId:p.id, date, system, physical, diff, condition, note});
+                    if(diff>0) addMovement(p.id,date,diff,0,'Penyesuaian stock opname: '+note,'OPNAME:'+opnameId);
+                    if(diff<0) addMovement(p.id,date,0,-diff,'Penyesuaian stock opname: '+note,'OPNAME:'+opnameId);
                     count++;
                 });
                 if(count) save();
