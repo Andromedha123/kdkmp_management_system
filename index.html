@@ -793,6 +793,74 @@
             }
         }
 
+
+        /* Dashboard welcome banner */
+        .welcome-banner {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 24px 27px;
+            margin-bottom: 20px;
+            border-radius: 16px;
+            color: #fff;
+            background: linear-gradient(115deg, #243b70 0%, #4263eb 58%, #6b83f5 100%);
+            box-shadow: 0 12px 28px #4263eb24;
+        }
+        .welcome-banner:after {
+            content: '';
+            position: absolute;
+            width: 210px;
+            height: 210px;
+            right: 7%;
+            top: -125px;
+            border: 1px solid #ffffff25;
+            border-radius: 50%;
+            box-shadow: 0 0 0 28px #ffffff0b, 0 0 0 58px #ffffff08;
+            pointer-events: none;
+        }
+        .welcome-copy { position: relative; z-index: 1; }
+        .welcome-kicker {
+            color: #dce5ff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .welcome-title {
+            margin: 0;
+            color: #fff;
+            font: 800 clamp(21px, 2.5vw, 28px) Manrope, sans-serif;
+            letter-spacing: -.6px;
+        }
+        .welcome-description {
+            margin: 8px 0 0;
+            max-width: 560px;
+            color: #e4eaff;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+        .welcome-date {
+            position: relative;
+            z-index: 1;
+            flex: 0 0 auto;
+            padding: 10px 14px;
+            border: 1px solid #ffffff38;
+            border-radius: 10px;
+            background: #ffffff16;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        @media(max-width:600px) {
+            .welcome-banner { align-items: flex-start; flex-direction: column; padding: 21px; }
+            .welcome-date { white-space: normal; }
+        }
+
         .login-screen {
             position: fixed;
             inset: 0;
@@ -944,7 +1012,8 @@
                     class="txt">Logbook & Evaluasi Harian</i></button>
             <div class="nav-label">BERITA ACARA</div>
             <button class="nav-btn" data-page="baopname"><span>▧</span><i class="txt">BA Stock Opname</i></button>
-            <button class="nav-btn" data-page="bakerusakan"><span>⚠</span><i class="txt">BA Kerusakan / Kadaluwarsa</i></button>
+            <button class="nav-btn" data-page="bakerusakan"><span>⚠</span><i class="txt">BA Kerusakan /
+                    Kadaluwarsa</i></button>
             <div class="side-foot">KDKMP · Prototype v1.1<br>Data tersimpan di browser ini</div>
         </aside>
         <main class="main">
@@ -955,11 +1024,19 @@
                 </div>
                 <div class="top-right">
                     <div class="date-chip" id="today"></div>
-                    <div class="user-chip"><span class="user-dot">A</span>Administrator</div><button class="logout-btn"
+                    <div class="user-chip"><span class="user-dot">I</span>Imawati</div><button class="logout-btn"
                         onclick="logout()">Keluar</button>
                 </div>
             </header>
             <section class="page active" id="dashboard">
+                <div class="welcome-banner">
+                    <div class="welcome-copy">
+                        <div class="welcome-kicker">KDKMP · Inventory &amp; Sales System</div>
+                        <h2 class="welcome-title" id="welcomeTitle">Selamat Datang, Administrator!</h2>
+                        <p class="welcome-description">Selamat beraktivitas. Pantau penjualan, persediaan, dan kegiatan operasional KDKMP melalui dashboard ini.</p>
+                    </div>
+                    <div class="welcome-date" id="welcomeDate"></div>
+                </div>
                 <div class="cards" id="dashCards"></div>
                 <div class="grid2">
                     <div class="panel">
@@ -1128,14 +1205,19 @@
             <section class="page" id="baopname">
                 <div class="panel">
                     <div class="panel-head">
-                        <div><h3>Berita Acara Stock Opname</h3><div class="sub">Dokumentasi selisih antara stok sistem dan stok fisik, termasuk alasan dan tindak lanjut.</div></div>
+                        <div>
+                            <h3>Berita Acara Stock Opname</h3>
+                            <div class="sub">Dokumentasi selisih antara stok sistem dan stok fisik, termasuk alasan dan
+                                tindak lanjut.</div>
+                        </div>
                         <div class="btnline">
                             <button class="btn" onclick="exportBAOpname()">Export Excel</button>
                             <button class="btn primary" onclick="openBAOpname()">＋ Buat Berita Acara</button>
                         </div>
                     </div>
                     <div class="toolbar">
-                        <div class="search"><input id="baOpnameSearch" placeholder="Cari SKU atau nama produk..." oninput="renderBAOpname()"></div>
+                        <div class="search"><input id="baOpnameSearch" placeholder="Cari SKU atau nama produk..."
+                                oninput="renderBAOpname()"></div>
                         <input type="date" id="baOpnameFrom" style="max-width:160px" onchange="renderBAOpname()">
                         <input type="date" id="baOpnameTo" style="max-width:160px" onchange="renderBAOpname()">
                     </div>
@@ -1145,14 +1227,20 @@
             <section class="page" id="bakerusakan">
                 <div class="panel">
                     <div class="panel-head">
-                        <div><h3>Berita Acara Kerusakan / Kadaluwarsa Barang</h3><div class="sub">Pencatatan barang rusak, kedaluwarsa, tidak layak jual, beserta penyebab dan penyelesaiannya.</div></div>
+                        <div>
+                            <h3>Berita Acara Kerusakan / Kadaluwarsa Barang</h3>
+                            <div class="sub">Pencatatan barang rusak, kedaluwarsa, tidak layak jual, beserta penyebab
+                                dan penyelesaiannya.</div>
+                        </div>
                         <div class="btnline">
                             <button class="btn" onclick="exportBADamage()">Export Excel</button>
                             <button class="btn primary" onclick="openBADamage()">＋ Buat Berita Acara</button>
                         </div>
                     </div>
                     <div class="toolbar">
-                        <div class="search"><input id="baDamageSearch" placeholder="Cari nama barang, kondisi, atau penyebab..." oninput="renderBADamage()"></div>
+                        <div class="search"><input id="baDamageSearch"
+                                placeholder="Cari nama barang, kondisi, atau penyebab..." oninput="renderBADamage()">
+                        </div>
                         <input type="date" id="baDamageFrom" style="max-width:160px" onchange="renderBADamage()">
                         <input type="date" id="baDamageTo" style="max-width:160px" onchange="renderBADamage()">
                     </div>
@@ -1818,6 +1906,15 @@
 
         function statCard(label, val, ic) { return `<div class="stat"><div class="stat-top">${label}<span class="stat-icon">${ic}</span></div><div class="stat-value">${val}</div></div>` }
         function renderDashboard() {
+            const hour = new Date().getHours();
+            const greeting = hour < 11 ? 'Selamat Pagi' : hour < 15 ? 'Selamat Siang' : hour < 18 ? 'Selamat Sore' : 'Selamat Malam';
+            const welcomeTitle = $('welcomeTitle');
+            const welcomeDate = $('welcomeDate');
+            if (welcomeTitle) welcomeTitle.textContent = `${greeting}, Sayangkuuu!`;
+            if (welcomeDate) welcomeDate.textContent = new Date().toLocaleDateString('id-ID', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+
             let total = db.sales.reduce((a, s) => a + num(s.total), 0);
             let profit = db.sales.reduce((a, s) => a + num(s.total) - num(product(s.productId)?.hpp) * num(s.qty), 0);
             let units = db.products.length;
@@ -1891,7 +1988,7 @@
                     ${field('Stock Sistem', 'baoSystem', old?.systemStock ?? stockOf(old?.productId || db.products[0].id), 'number', 'min="0" readonly')}
                     ${field('Stock Fisik', 'baoPhysical', old?.physicalStock ?? '', 'number', 'min="0" step="any" oninput="updateBAOpnameDifference()"')}
                     ${field('Selisih (Fisik - Sistem)', 'baoDiff', old?.difference ?? 0, 'number', 'readonly')}
-                    <div class="formfield"><label>Status Tindakan</label><select id="baoStatus">${['Belum ditindaklanjuti','Dalam proses','Disesuaikan','Selesai','Perlu pemeriksaan lanjutan'].map(v => `<option ${old?.status === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+                    <div class="formfield"><label>Status Tindakan</label><select id="baoStatus">${['Belum ditindaklanjuti', 'Dalam proses', 'Disesuaikan', 'Selesai', 'Perlu pemeriksaan lanjutan'].map(v => `<option ${old?.status === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
                     <div class="formfield full"><label>Keterangan / Alasan</label><textarea id="baoReason" rows="3" placeholder="Jelaskan penyebab terjadinya selisih...">${esc(old?.reason || '')}</textarea></div>
                 </div>
                 <div class="notice">Berita acara ini hanya menjadi dokumentasi pemeriksaan. Untuk mengubah saldo stok, gunakan modul Stock Opname.</div>
@@ -1924,7 +2021,7 @@
             host.innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>Kode SKU</th><th>Nama Produk</th><th>Stock Sistem</th><th>Stock Fisik</th><th>Selisih</th><th>Keterangan / Alasan</th><th>Status Tindakan</th><th>Aksi</th></tr></thead><tbody>${rows.map(x => `<tr><td>${esc(x.date)}</td><td><b>${esc(x.sku || '-')}</b></td><td>${esc(x.productName || product(x.productId)?.name || '-')}</td><td>${num(x.systemStock)}</td><td>${num(x.physicalStock)}</td><td class="${num(x.difference) < 0 ? 'negative' : num(x.difference) > 0 ? 'positive' : ''}">${num(x.difference) > 0 ? '+' : ''}${num(x.difference)}</td><td style="white-space:normal;min-width:180px">${esc(x.reason || '-')}</td><td><span class="pill ${x.status === 'Selesai' || x.status === 'Disesuaikan' ? 'green' : 'amber'}">${esc(x.status || '-')}</span></td><td><div class="actions"><button class="action" onclick="openBAOpname('${x.id}')">Edit</button><button class="action" onclick="deleteBARecord('baOpnames','${x.id}','Berita Acara Stock Opname')">Hapus</button></div></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Belum ada Berita Acara Stock Opname.</div>';
         }
         function exportBAOpname() {
-            const rows = db.baOpnames.map(x => ({Tanggal:x.date, 'Kode SKU':x.sku, 'Nama Produk':x.productName, 'Stock Sistem':x.systemStock, 'Stock Fisik':x.physicalStock, Selisih:x.difference, 'Keterangan / Alasan':x.reason, 'Status Tindakan':x.status}));
+            const rows = db.baOpnames.map(x => ({ Tanggal: x.date, 'Kode SKU': x.sku, 'Nama Produk': x.productName, 'Stock Sistem': x.systemStock, 'Stock Fisik': x.physicalStock, Selisih: x.difference, 'Keterangan / Alasan': x.reason, 'Status Tindakan': x.status }));
             if (!rows.length) return showToast('Belum ada data untuk diekspor.', 'info');
             exportRows(rows, 'Berita_Acara_Stock_Opname.xlsx', 'BA Stock Opname');
         }
@@ -1936,7 +2033,7 @@
                     ${field('Tanggal', 'badDate', old?.date || today(), 'date')}
                     ${field('Nama Barang', 'badName', old?.itemName || '', 'text', 'placeholder="Masukkan nama barang"')}
                     ${field('Jumlah', 'badQty', old?.qty ?? 1, 'number', 'min="0.01" step="any"')}
-                    <div class="formfield"><label>Kondisi Kerusakan</label><select id="badCondition">${['Rusak','Kadaluwarsa / Expired','Kemasan rusak','Bocor / Pecah','Tidak layak jual','Lainnya'].map(v => `<option ${old?.condition === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+                    <div class="formfield"><label>Kondisi Kerusakan</label><select id="badCondition">${['Rusak', 'Kadaluwarsa / Expired', 'Kemasan rusak', 'Bocor / Pecah', 'Tidak layak jual', 'Lainnya'].map(v => `<option ${old?.condition === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
                     <div class="formfield full"><label>Penyebab</label><textarea id="badCause" rows="3" placeholder="Jelaskan penyebab kerusakan / kadaluwarsa...">${esc(old?.cause || '')}</textarea></div>
                     <div class="formfield full"><label>Tindakan / Penyelesaian</label><textarea id="badAction" rows="3" placeholder="Jelaskan tindakan atau penyelesaian yang dilakukan...">${esc(old?.action || '')}</textarea></div>
                 </div>
@@ -1956,7 +2053,7 @@
             host.innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>Nama Barang</th><th>Jumlah</th><th>Kondisi Kerusakan</th><th>Penyebab</th><th>Tindakan / Penyelesaian</th><th>Aksi</th></tr></thead><tbody>${rows.map(x => `<tr><td>${esc(x.date)}</td><td><b>${esc(x.itemName)}</b></td><td>${num(x.qty)}</td><td><span class="pill red">${esc(x.condition)}</span></td><td style="white-space:normal;min-width:180px">${esc(x.cause || '-')}</td><td style="white-space:normal;min-width:180px">${esc(x.action || '-')}</td><td><div class="actions"><button class="action" onclick="openBADamage('${x.id}')">Edit</button><button class="action" onclick="deleteBARecord('baDamages','${x.id}','Berita Acara Kerusakan / Kadaluwarsa')">Hapus</button></div></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Belum ada Berita Acara Kerusakan / Kadaluwarsa.</div>';
         }
         function exportBADamage() {
-            const rows = db.baDamages.map(x => ({Tanggal:x.date, 'Nama Barang':x.itemName, Jumlah:x.qty, 'Kondisi Kerusakan':x.condition, Penyebab:x.cause, 'Tindakan / Penyelesaian':x.action}));
+            const rows = db.baDamages.map(x => ({ Tanggal: x.date, 'Nama Barang': x.itemName, Jumlah: x.qty, 'Kondisi Kerusakan': x.condition, Penyebab: x.cause, 'Tindakan / Penyelesaian': x.action }));
             if (!rows.length) return showToast('Belum ada data untuk diekspor.', 'info');
             exportRows(rows, 'Berita_Acara_Kerusakan_Kadaluwarsa.xlsx', 'BA Kerusakan');
         }
