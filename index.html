@@ -610,40 +610,135 @@
             }
         }
 
-        .login-screen{position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#111d33 0%,#243b62 55%,#4263eb 100%);display:flex;align-items:center;justify-content:center;padding:20px}
-        .login-card{width:min(420px,100%);background:#fff;border-radius:20px;padding:34px;box-shadow:0 24px 80px #07132955}
-        .login-brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}
-        .login-brand .brand-mark{flex:none;color:#fff}
-        .login-card h1{font:800 23px Manrope;margin:0 0 7px;color:#172033}
-        .login-card .login-sub{font-size:12px;color:#7c879b;margin-bottom:24px}
-        .login-field{margin:14px 0}
-        .login-field label{display:block;font-size:11px;font-weight:700;color:#68758b;margin-bottom:7px}
-        .login-field input{height:44px;font-size:13px}
-        .login-submit{width:100%;height:45px;border-radius:9px;background:#4263eb;color:white;font-weight:700;margin-top:10px}
-        .login-error{display:none;background:#fff0f1;color:#c94d57;border-radius:8px;padding:10px 12px;font-size:11px;margin-top:13px}
-        .login-error.show{display:block}
-        .logout-btn{padding:9px 12px;border-radius:8px;background:#fff0f1;color:#c94d57;font-size:11px;font-weight:700}
-        .app.locked{visibility:hidden}
-        @media(max-width:500px){.login-card{padding:25px}}
+        .login-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #111d33 0%, #243b62 55%, #4263eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px
+        }
 
+        .login-card {
+            width: min(420px, 100%);
+            background: #fff;
+            border-radius: 20px;
+            padding: 34px;
+            box-shadow: 0 24px 80px #07132955
+        }
+
+        .login-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px
+        }
+
+        .login-brand .brand-mark {
+            flex: none;
+            color: #fff
+        }
+
+        .login-card h1 {
+            font: 800 23px Manrope;
+            margin: 0 0 7px;
+            color: #172033
+        }
+
+        .login-card .login-sub {
+            font-size: 12px;
+            color: #7c879b;
+            margin-bottom: 24px
+        }
+
+        .login-field {
+            margin: 14px 0
+        }
+
+        .login-field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #68758b;
+            margin-bottom: 7px
+        }
+
+        .login-field input {
+            height: 44px;
+            font-size: 13px
+        }
+
+        .login-submit {
+            width: 100%;
+            height: 45px;
+            border-radius: 9px;
+            background: #4263eb;
+            color: white;
+            font-weight: 700;
+            margin-top: 10px
+        }
+
+        .login-error {
+            display: none;
+            background: #fff0f1;
+            color: #c94d57;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 11px;
+            margin-top: 13px
+        }
+
+        .login-error.show {
+            display: block
+        }
+
+        .logout-btn {
+            padding: 9px 12px;
+            border-radius: 8px;
+            background: #fff0f1;
+            color: #c94d57;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+        .app.locked {
+            visibility: hidden
+        }
+
+        @media(max-width:500px) {
+            .login-card {
+                padding: 25px
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <section class="login-screen" id="loginScreen">
-      <div class="login-card">
-        <div class="login-brand"><div class="brand-mark">K</div><div><strong style="font:800 17px Manrope;color:#172033">KDKMP</strong><small style="display:block;color:#7c879b;font-size:11px">Inventory &amp; Sales System</small></div></div>
-        <h1>Selamat Datang</h1>
-        <div class="login-sub">Silakan masuk untuk mengakses sistem operasional KDKMP.</div>
-        <form id="loginForm" autocomplete="on">
-          <div class="login-field"><label for="loginUsername">USERNAME</label><input id="loginUsername" name="username" type="text" placeholder="Masukkan username" autocomplete="username" required></div>
-          <div class="login-field"><label for="loginPassword">PASSWORD</label><input id="loginPassword" name="password" type="password" placeholder="Masukkan password" autocomplete="current-password" required></div>
-          <button class="login-submit" type="submit">Masuk ke Sistem</button>
-          <div class="login-error" id="loginError" role="alert">Username atau password salah. Silakan coba kembali.</div>
-        </form>
-        <div style="font-size:10px;color:#9aa4b4;text-align:center;margin-top:22px">KDKMP · Sistem Operasional</div>
-      </div>
+        <div class="login-card">
+            <div class="login-brand">
+                <div class="brand-mark">K</div>
+                <div><strong style="font:800 17px Manrope;color:#172033">KDKMP</strong><small
+                        style="display:block;color:#7c879b;font-size:11px">Inventory &amp; Sales System</small></div>
+            </div>
+            <h1>Selamat Datang</h1>
+            <div class="login-sub">Silakan masuk untuk mengakses sistem operasional KDKMP.</div>
+            <form id="loginForm" autocomplete="on">
+                <div class="login-field"><label for="loginUsername">USERNAME</label><input id="loginUsername"
+                        name="username" type="text" placeholder="Masukkan username" autocomplete="username" required>
+                </div>
+                <div class="login-field"><label for="loginPassword">PASSWORD</label><input id="loginPassword"
+                        name="password" type="password" placeholder="Masukkan password" autocomplete="current-password"
+                        required></div>
+                <button class="login-submit" type="submit">Masuk ke Sistem</button>
+                <div class="login-error" id="loginError" role="alert">Username atau password salah. Silakan coba
+                    kembali.</div>
+            </form>
+            <div style="font-size:10px;color:#9aa4b4;text-align:center;margin-top:22px">KDKMP · Sistem Operasional</div>
+        </div>
     </section>
 
     <div class="app locked" id="mainApp">
@@ -659,9 +754,10 @@
                 data-page="stockcard"><span>⇄</span><i class="txt">Stock Card</i></button><button class="nav-btn"
                 data-page="opname"><span>▣</span><i class="txt">Stock Opname</i></button>
             <div class="nav-label">PENGINPUTAN</div><button class="nav-btn" data-page="sales"><span>＋</span><i
-                    class="txt">Penjualan Harian</i></button><button class="nav-btn"
-                data-page="rekap"><span>▥</span><i class="txt">Rekap Bulanan</i></button>
-            <div class="nav-label">OPERASIONAL & SDM</div><button class="nav-btn" data-page="logbook"><span>✎</span><i class="txt">Logbook & Evaluasi Harian</i></button>
+                    class="txt">Penjualan Harian</i></button><button class="nav-btn" data-page="rekap"><span>▥</span><i
+                    class="txt">Rekap Bulanan</i></button>
+            <div class="nav-label">OPERASIONAL & SDM</div><button class="nav-btn" data-page="logbook"><span>✎</span><i
+                    class="txt">Logbook & Evaluasi Harian</i></button>
             <div class="side-foot">KDKMP · Prototype v1.1<br>Data tersimpan di browser ini</div>
         </aside>
         <main class="main">
@@ -672,7 +768,8 @@
                 </div>
                 <div class="top-right">
                     <div class="date-chip" id="today"></div>
-                    <div class="user-chip"><span class="user-dot">A</span>Administrator</div><button class="logout-btn" onclick="logout()">Keluar</button>
+                    <div class="user-chip"><span class="user-dot">A</span>Administrator</div><button class="logout-btn"
+                        onclick="logout()">Keluar</button>
                 </div>
             </header>
             <section class="page active" id="dashboard">
@@ -781,11 +878,26 @@
                 </div>
             </section>
             <section class="page" id="logbook">
-<div class="panel"><div class="panel-head"><div><h3>Logbook & Evaluasi Harian</h3><div class="sub">Catatan operasional, evaluasi karyawan dan rencana pengembangan</div></div><button class="btn" onclick="exportLogbook()">↓ Export Excel</button></div>
-<div class="btnline" style="margin-bottom:18px"><button class="btn primary" id="tabLog" onclick="setLogTab('log')">Logbook Harian</button><button class="btn" id="tabEval" onclick="setLogTab('eval')">Evaluasi Staff</button><button class="btn" id="tabDev" onclick="setLogTab('dev')">Personal Dev Plan</button></div>
-<div class="toolbar"><div class="search"><input id="logSearch" placeholder="Cari catatan, karyawan, kompetensi..." oninput="renderLogbook()"></div><button class="btn primary" onclick="openLogEntry()">＋ Tambah Data</button></div><div class="table-wrap" id="logTable"></div>
-</div></section>
-<section class="page" id="rekap">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h3>Logbook & Evaluasi Harian</h3>
+                            <div class="sub">Catatan operasional, evaluasi karyawan dan rencana pengembangan</div>
+                        </div><button class="btn" onclick="exportLogbook()">↓ Export Excel</button>
+                    </div>
+                    <div class="btnline" style="margin-bottom:18px"><button class="btn primary" id="tabLog"
+                            onclick="setLogTab('log')">Logbook Harian</button><button class="btn" id="tabEval"
+                            onclick="setLogTab('eval')">Evaluasi Staff</button><button class="btn" id="tabDev"
+                            onclick="setLogTab('dev')">Personal Dev Plan</button></div>
+                    <div class="toolbar">
+                        <div class="search"><input id="logSearch" placeholder="Cari catatan, karyawan, kompetensi..."
+                                oninput="renderLogbook()"></div><button class="btn primary" onclick="openLogEntry()">＋
+                            Tambah Data</button>
+                    </div>
+                    <div class="table-wrap" id="logTable"></div>
+                </div>
+            </section>
+            <section class="page" id="rekap">
                 <div class="panel">
                     <div class="panel-head">
                         <div>
@@ -812,107 +924,107 @@
         </div>
     </div>
     <script>
-        const $ = id => document.getElementById(id), rupiah = n => new Intl.NumberFormat('id-ID', {style: 'currency', currency: 'IDR', maximumFractionDigits: 0}).format(Number(n) || 0), num = v => Number(String(v ?? 0).replace(/[^\d.-]/g, '')) || 0, today = () => new Date().toISOString().slice(0, 10), uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const $ = id => document.getElementById(id), rupiah = n => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(n) || 0), num = v => Number(String(v ?? 0).replace(/[^\d.-]/g, '')) || 0, today = () => new Date().toISOString().slice(0, 10), uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
         // Login prototype: validasi dilakukan di sisi browser.
         const LOGIN_USERNAME = 'admin';
         const LOGIN_PASSWORD = 'AndroIma123';
-        function isLoggedIn(){return sessionStorage.getItem('kdkmp_authenticated')==='true'}
-        function showLogin(){
-          $('loginScreen').style.display='flex';
-          $('mainApp').classList.add('locked');
-          $('loginPassword').value='';
+        function isLoggedIn() { return sessionStorage.getItem('kdkmp_authenticated') === 'true' }
+        function showLogin() {
+            $('loginScreen').style.display = 'flex';
+            $('mainApp').classList.add('locked');
+            $('loginPassword').value = '';
         }
-        function enterApp(){
-          $('loginScreen').style.display='none';
-          $('mainApp').classList.remove('locked');
+        function enterApp() {
+            $('loginScreen').style.display = 'none';
+            $('mainApp').classList.remove('locked');
         }
-        function logout(){
-          sessionStorage.removeItem('kdkmp_authenticated');
-          showLogin();
-          $('loginUsername').value='';
-          $('loginError').classList.remove('show');
-        }
-        $('loginForm').addEventListener('submit',function(event){
-          event.preventDefault();
-          const username=$('loginUsername').value.trim();
-          const password=$('loginPassword').value;
-          if(username===LOGIN_USERNAME && password===LOGIN_PASSWORD){
-            sessionStorage.setItem('kdkmp_authenticated','true');
+        function logout() {
+            sessionStorage.removeItem('kdkmp_authenticated');
+            showLogin();
+            $('loginUsername').value = '';
             $('loginError').classList.remove('show');
-            enterApp();
-            $('loginPassword').value='';
-          }else{
-            $('loginError').classList.add('show');
-            $('loginPassword').value='';
-            $('loginPassword').focus();
-          }
+        }
+        $('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const username = $('loginUsername').value.trim();
+            const password = $('loginPassword').value;
+            if (username === LOGIN_USERNAME && password === LOGIN_PASSWORD) {
+                sessionStorage.setItem('kdkmp_authenticated', 'true');
+                $('loginError').classList.remove('show');
+                enterApp();
+                $('loginPassword').value = '';
+            } else {
+                $('loginError').classList.add('show');
+                $('loginPassword').value = '';
+                $('loginPassword').focus();
+            }
         });
-        if(isLoggedIn()) enterApp(); else showLogin();
+        if (isLoggedIn()) enterApp(); else showLogin();
 
-        let db = JSON.parse(localStorage.getItem('kdkmp_db') || 'null') || {products: [], movements: [], opnames: [], sales: []}; db.logbooks ||= []; db.evaluations ||= []; db.devplans ||= [];
-        function save() {localStorage.setItem('kdkmp_db', JSON.stringify(db)); renderAll()}
-        function esc(s) {return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]))}
-        function stockOf(id) {return db.movements.filter(m => m.productId === id).reduce((a, m) => a + num(m.in) - num(m.out), 0)}
-        function product(id) {return db.products.find(p => p.id === id)}
-        function margin(p) {return num(p.price) - num(p.hpp)}
-        function marginPct(p) {return num(p.price) ? margin(p) / num(p.price) * 100 : 0}
-        function addMovement(productId, date, inn, out, desc, ref = '') {db.movements.push({id: uid(), productId, date, in: num(inn), out: num(out), desc, ref})}
-        function showPage(id) {document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id)); document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === id)); $('pageTitle').textContent = ({dashboard: 'Dashboard', barang: 'Master Data Barang', stockcard: 'Stock Card', opname: 'Stock Opname', sales: 'Penjualan Harian', logbook: 'Logbook & Evaluasi Harian', rekap: 'Rekap Bulanan'})[id]; if (id === 'dashboard') renderDashboard()}
+        let db = JSON.parse(localStorage.getItem('kdkmp_db') || 'null') || { products: [], movements: [], opnames: [], sales: [] }; db.logbooks ||= []; db.evaluations ||= []; db.devplans ||= [];
+        function save() { localStorage.setItem('kdkmp_db', JSON.stringify(db)); renderAll() }
+        function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
+        function stockOf(id) { return db.movements.filter(m => m.productId === id).reduce((a, m) => a + num(m.in) - num(m.out), 0) }
+        function product(id) { return db.products.find(p => p.id === id) }
+        function margin(p) { return num(p.price) - num(p.hpp) }
+        function marginPct(p) { return num(p.price) ? margin(p) / num(p.price) * 100 : 0 }
+        function addMovement(productId, date, inn, out, desc, ref = '') { db.movements.push({ id: uid(), productId, date, in: num(inn), out: num(out), desc, ref }) }
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id)); document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === id)); $('pageTitle').textContent = ({ dashboard: 'Dashboard', barang: 'Master Data Barang', stockcard: 'Stock Card', opname: 'Stock Opname', sales: 'Penjualan Harian', logbook: 'Logbook & Evaluasi Harian', rekap: 'Rekap Bulanan' })[id]; if (id === 'dashboard') renderDashboard() }
         document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => showPage(b.dataset.page));
-        function modal(title, body, saveLabel, fn) {$('modalTitle').textContent = title; $('modalBody').innerHTML = body; $('modalActions').innerHTML = '<button class="btn" onclick="closeModal()">Batal</button><button class="btn primary" id="modalSave">' + saveLabel + '</button>'; $('modal').classList.add('show'); $('modalSave').onclick = fn}
-        function closeModal() {$('modal').classList.remove('show')}
-        function field(label, id, value = '', type = 'text', extra = '') {return `<div class="formfield"><label>${label}</label><input id="${id}" type="${type}" value="${esc(value)}" ${extra}></div>`}
-        function selectField(label, id, opts, value = '') {return `<div class="formfield"><label>${label}</label><select id="${id}">${opts.map(o => `<option ${o === value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>`}
-        function openProduct(id = '') {let p = id ? product(id) : {sku: '', brand: '', name: '', category: '', unit: 'Pcs', hpp: 0, price: 0}; modal(id ? 'Edit Barang' : 'Tambah Barang', `<div class="formgrid">${field('Kode SKU', 'pSku', p.sku)}${field('Brand', 'pBrand', p.brand)}${field('Nama Produk', 'pName', p.name)}${field('Kategori', 'pCategory', p.category)}${field('Satuan', 'pUnit', p.unit)}${field('HPP (Rp)', 'pHpp', p.hpp, 'number', 'min="0"')} ${field('Harga Jual (Rp)', 'pPrice', p.price, 'number', 'min="0"')}<div class="formfield"><label>Margin (Rp)</label><input id="pMargin" disabled value="${rupiah(margin(p))}"></div><div class="formfield"><label>Persentase Margin</label><input id="pPct" disabled value="${marginPct(p).toFixed(2)}%"></div></div><div class="notice">Margin = Harga Jual − HPP. Persentase Margin = (Margin ÷ Harga Jual) × 100%. Persentase ini menggunakan harga jual sebagai dasar perhitungan.</div>`, 'Simpan', () => {let sku = $('pSku').value.trim(), name = $('pName').value.trim(); if (!sku || !name) return alert('Kode SKU dan Nama Produk wajib diisi.'); if (db.products.some(x => x.sku.toLowerCase() === sku.toLowerCase() && x.id !== id)) return alert('Kode SKU sudah digunakan.'); let obj = {id: id || uid(), sku, brand: $('pBrand').value.trim(), name, category: $('pCategory').value.trim(), unit: $('pUnit').value.trim() || 'Pcs', hpp: num($('pHpp').value), price: num($('pPrice').value)}; if (id) db.products[db.products.findIndex(x => x.id === id)] = obj; else {db.products.push(obj); addMovement(obj.id, today(), 0, 0, 'Saldo awal (belum diisi)')} save(); closeModal()});['pHpp', 'pPrice'].forEach(k => setTimeout(() => $(k).oninput = () => {let h = num($('pHpp').value), s = num($('pPrice').value), m = s - h; $('pMargin').value = rupiah(m); $('pPct').value = (s ? m / s * 100 : 0).toFixed(2) + '%'}, 0))}
-        function renderProducts() {let q = ($('productSearch')?.value || '').toLowerCase(), rows = db.products.filter(p => (p.sku + ' ' + p.brand + ' ' + p.name + ' ' + p.category).toLowerCase().includes(q)); $('productTable').innerHTML = rows.length ? `<table><thead><tr><th>SKU</th><th>Brand / Produk</th><th>Kategori</th><th>Satuan</th><th>HPP</th><th>Harga Jual</th><th>Margin</th><th>% Margin</th><th>Stok</th><th>Aksi</th></tr></thead><tbody>${rows.map(p => `<tr><td><b>${esc(p.sku)}</b></td><td><b>${esc(p.brand)}</b><div class="muted">${esc(p.name)}</div></td><td>${esc(p.category)}</td><td>${esc(p.unit)}</td><td>${rupiah(p.hpp)}</td><td>${rupiah(p.price)}</td><td class="${margin(p) >= 0 ? 'positive' : 'negative'}">${rupiah(margin(p))}</td><td>${marginPct(p).toFixed(2)}%</td><td>${stockOf(p.id)} ${esc(p.unit)}</td><td><div class="actions"><button class="action" onclick="openProduct('${p.id}')">Edit</button><button class="action" onclick="deleteProduct('${p.id}')">Hapus</button></div></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Belum ada data barang. Tambahkan barang atau import file Excel.</div>'}
-        function deleteProduct(id) {if (!confirm('Hapus barang ini? Riwayat transaksi tetap tersimpan.')) return; db.products = db.products.filter(p => p.id !== id); save()}
-        function openMovement() {let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join(''); if (!opts) return alert('Tambahkan master barang terlebih dahulu.'); modal('Input Mutasi Stok', `<div class="formgrid">${selectRaw('Barang', 'mProduct', opts)}${field('Tanggal', 'mDate', today(), 'date')}${field('Barang Masuk (Qty)', 'mIn', 0, 'number', 'min="0"')}${field('Barang Keluar (Qty)', 'mOut', 0, 'number', 'min="0"')}<div class="formfield full"><label>Keterangan</label><input id="mDesc" placeholder="Pembelian, koreksi, retur, dll"></div></div>`, 'Simpan', () => {let a = num($('mIn').value), b = num($('mOut').value); if (a && b) return alert('Isi barang masuk atau barang keluar, bukan keduanya sekaligus.'); addMovement($('mProduct').value, $('mDate').value, a, b, $('mDesc').value || 'Mutasi manual'); save(); closeModal()})}
-        function selectRaw(label, id, options) {return `<div class="formfield"><label>${label}</label><select id="${id}">${options}</select></div>`}
-        function renderStock() {let q = ($('stockSearch')?.value || '').toLowerCase(), from = $('stockFrom')?.value || '', to = $('stockTo')?.value || '', rows = db.movements.filter(m => {let p = product(m.productId); return p && (p.sku + ' ' + p.name).toLowerCase().includes(q) && (!from || m.date >= from) && (!to || m.date <= to)}).sort((a, b) => a.date.localeCompare(b.date)); let running = {}; $('stockTable').innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>Kode SKU</th><th>Nama Produk</th><th>Stock Awal*</th><th>Barang Masuk</th><th>Barang Keluar</th><th>Stock Akhir*</th><th>Keterangan</th></tr></thead><tbody>${rows.map(m => {let p = product(m.productId), before = running[m.productId] || 0, after = before + m.in - m.out; running[m.productId] = after; return `<tr><td>${esc(m.date)}</td><td>${esc(p.sku)}</td><td>${esc(p.name)}</td><td>${before}</td><td class="positive">${m.in || '—'}</td><td class="negative">${m.out || '—'}</td><td><b>${after}</b></td><td>${esc(m.desc)}</td></tr>`}).join('')}</tbody></table><div class="footer-note">*Stock awal/akhir dihitung dari mutasi yang tampil sesuai filter tanggal. Mutasi transaksi penjualan dan opname tercatat otomatis.</div>` : '<div class="empty">Belum ada mutasi stok.</div>'}
-        function openOpname() {if (!db.products.length) return alert('Tambahkan master barang terlebih dahulu.'); let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join(''); modal('Input Stock Opname', `<div class="formgrid">${selectRaw('Barang', 'oProduct', opts)}${field('Tanggal', 'oDate', today(), 'date')}<div class="formfield"><label>Stock Sistem</label><input id="oSystem" disabled></div>${field('Stock Fisik', 'oPhysical', 0, 'number', 'min="0"')}${selectField('Kondisi Barang', 'oCondition', ['Baik', 'Rusak', 'Expired', 'Hilang', 'Lainnya'])}<div class="formfield"><label>Tindakan / Catatan</label><input id="oNote" placeholder="Catatan pemeriksaan"></div></div><div class="notice">Jika disimpan, selisih akan dibuat sebagai mutasi penyesuaian agar stok sistem sama dengan stok fisik.</div>`, 'Simpan Opname', () => {let id = $('oProduct').value, sys = stockOf(id), phy = num($('oPhysical').value), diff = phy - sys; db.opnames.push({id: uid(), productId: id, date: $('oDate').value, system: sys, physical: phy, diff, condition: $('oCondition').value, note: $('oNote').value}); if (diff > 0) addMovement(id, $('oDate').value, diff, 0, 'Penyesuaian stock opname: ' + $('oNote').value); if (diff < 0) addMovement(id, $('oDate').value, 0, -diff, 'Penyesuaian stock opname: ' + $('oNote').value); save(); closeModal()}); setTimeout(() => {$('oProduct').onchange = () => $('oSystem').value = stockOf($('oProduct').value); $('oSystem').value = stockOf(db.products[0].id)}, 0)}
-        function renderOpnames() {$('opnameTable').innerHTML = db.opnames.length ? `<table><thead><tr><th>Tanggal</th><th>SKU</th><th>Nama Produk</th><th>Stock Sistem</th><th>Stock Fisik</th><th>Selisih</th><th>Kondisi</th><th>Tindakan/Catatan</th></tr></thead><tbody>${db.opnames.slice().reverse().map(o => {let p = product(o.productId); return `<tr><td>${esc(o.date)}</td><td>${esc(p?.sku || '-')}</td><td>${esc(p?.name || '-')}</td><td>${o.system}</td><td>${o.physical}</td><td class="${o.diff >= 0 ? 'positive' : 'negative'}">${o.diff > 0 ? '+' : ''}${o.diff}</td><td><span class="pill ${o.condition === 'Baik' ? 'green' : 'amber'}">${esc(o.condition)}</span></td><td>${esc(o.note)}</td></tr>`}).join('')}</tbody></table>` : '<div class="empty">Belum ada data stock opname.</div>'}
-        function openSale() {if (!db.products.length) return alert('Tambahkan master barang terlebih dahulu.'); let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)} (${rupiah(p.price)})</option>`).join(''); modal('Input Penjualan Harian', `<div class="formgrid">${field('Tanggal', 'sDate', today(), 'date')}${field('No. Transaksi', 'sNo', 'TRX-' + Date.now().toString().slice(-6))}${field('Waktu', 'sTime', new Date().toTimeString().slice(0, 5), 'time')}${selectRaw('Nama Barang', 'sProduct', opts)}${field('QTY', 'sQty', 1, 'number', 'min="1"')}${field('Harga Satuan (otomatis)', 'sPrice', db.products[0].price, 'number', 'min="0"')}${field('Total', 'sTotal', rupiah(db.products[0].price))}${selectField('Metode Bayar', 'sMethod', ['Tunai', 'QRIS', 'Transfer', 'Debit', 'Kredit'])}</div><div class="notice">Harga satuan otomatis mengikuti Harga Jual di Master Data Barang.</div>`, 'Simpan Transaksi', () => {let p = product($('sProduct').value), qty = num($('sQty').value); if (!p || qty <= 0) return alert('Pilih barang dan isi QTY lebih dari 0.'); if (stockOf(p.id) < qty && !confirm('Stok sistem kurang dari jumlah penjualan. Tetap simpan?')) return; let sale = {id: uid(), date: $('sDate').value, no: $('sNo').value, time: $('sTime').value, productId: p.id, qty, price: num($('sPrice').value), total: qty * num($('sPrice').value), method: $('sMethod').value}; db.sales.push(sale); addMovement(p.id, sale.date, 0, qty, 'Penjualan ' + sale.no, sale.no); save(); closeModal()}); setTimeout(() => {let update = () => {let p = product($('sProduct').value); $('sPrice').value = p?.price || 0; $('sTotal').value = rupiah(num($('sQty').value) * num($('sPrice').value))}; $('sProduct').onchange = update; $('sQty').oninput = update; $('sPrice').oninput = update}, 0)}
-        function renderSales() {let q = ($('saleSearch')?.value || '').toLowerCase(), d = $('saleDate')?.value || '', rows = db.sales.filter(s => {let p = product(s.productId); return (s.no + ' ' + (p?.name || '')).toLowerCase().includes(q) && (!d || s.date === d)}).slice().reverse(); $('salesTable').innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>No. Trx</th><th>Waktu</th><th>Nama Barang</th><th>QTY</th><th>Harga Satuan</th><th>Total</th><th>Metode Bayar</th><th>Aksi</th></tr></thead><tbody>${rows.map(s => {let p = product(s.productId); return `<tr><td>${s.date}</td><td><b>${esc(s.no)}</b></td><td>${esc(s.time)}</td><td>${esc(p?.name || 'Barang dihapus')}</td><td>${s.qty}</td><td>${rupiah(s.price)}</td><td><b>${rupiah(s.total)}</b></td><td><span class="pill ${s.method === 'Tunai' ? 'green' : s.method === 'Bon' ? 'amber' : ''}">${esc(s.method)}</span></td><td><button class="action" onclick="deleteSale('${s.id}')">Hapus</button></td></tr>`}).join('')}</tbody></table>` : '<div class="empty">Belum ada transaksi penjualan.</div>'}
-        function deleteSale(id) {let s = db.sales.find(x => x.id === id); if (!s || !confirm('Hapus transaksi ini? Stok akan dikembalikan.')) return; db.sales = db.sales.filter(x => x.id !== id); let m = db.movements.find(x => x.ref === s.no && x.desc === 'Penjualan ' + s.no); if (m) db.movements = db.movements.filter(x => x.id !== m.id); save()}
+        function modal(title, body, saveLabel, fn) { $('modalTitle').textContent = title; $('modalBody').innerHTML = body; $('modalActions').innerHTML = '<button class="btn" onclick="closeModal()">Batal</button><button class="btn primary" id="modalSave">' + saveLabel + '</button>'; $('modal').classList.add('show'); $('modalSave').onclick = fn }
+        function closeModal() { $('modal').classList.remove('show') }
+        function field(label, id, value = '', type = 'text', extra = '') { return `<div class="formfield"><label>${label}</label><input id="${id}" type="${type}" value="${esc(value)}" ${extra}></div>` }
+        function selectField(label, id, opts, value = '') { return `<div class="formfield"><label>${label}</label><select id="${id}">${opts.map(o => `<option ${o === value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>` }
+        function openProduct(id = '') { let p = id ? product(id) : { sku: '', brand: '', name: '', category: '', unit: 'Pcs', hpp: 0, price: 0 }; modal(id ? 'Edit Barang' : 'Tambah Barang', `<div class="formgrid">${field('Kode SKU', 'pSku', p.sku)}${field('Brand', 'pBrand', p.brand)}${field('Nama Produk', 'pName', p.name)}${field('Kategori', 'pCategory', p.category)}${field('Satuan', 'pUnit', p.unit)}${field('HPP (Rp)', 'pHpp', p.hpp, 'number', 'min="0"')} ${field('Harga Jual (Rp)', 'pPrice', p.price, 'number', 'min="0"')}<div class="formfield"><label>Margin (Rp)</label><input id="pMargin" disabled value="${rupiah(margin(p))}"></div><div class="formfield"><label>Persentase Margin</label><input id="pPct" disabled value="${marginPct(p).toFixed(2)}%"></div></div><div class="notice">Margin = Harga Jual − HPP. Persentase Margin = (Margin ÷ Harga Jual) × 100%. Persentase ini menggunakan harga jual sebagai dasar perhitungan.</div>`, 'Simpan', () => { let sku = $('pSku').value.trim(), name = $('pName').value.trim(); if (!sku || !name) return alert('Kode SKU dan Nama Produk wajib diisi.'); if (db.products.some(x => x.sku.toLowerCase() === sku.toLowerCase() && x.id !== id)) return alert('Kode SKU sudah digunakan.'); let obj = { id: id || uid(), sku, brand: $('pBrand').value.trim(), name, category: $('pCategory').value.trim(), unit: $('pUnit').value.trim() || 'Pcs', hpp: num($('pHpp').value), price: num($('pPrice').value) }; if (id) db.products[db.products.findIndex(x => x.id === id)] = obj; else { db.products.push(obj); addMovement(obj.id, today(), 0, 0, 'Saldo awal (belum diisi)') } save(); closeModal() });['pHpp', 'pPrice'].forEach(k => setTimeout(() => $(k).oninput = () => { let h = num($('pHpp').value), s = num($('pPrice').value), m = s - h; $('pMargin').value = rupiah(m); $('pPct').value = (s ? m / s * 100 : 0).toFixed(2) + '%' }, 0)) }
+        function renderProducts() { let q = ($('productSearch')?.value || '').toLowerCase(), rows = db.products.filter(p => (p.sku + ' ' + p.brand + ' ' + p.name + ' ' + p.category).toLowerCase().includes(q)); $('productTable').innerHTML = rows.length ? `<table><thead><tr><th>SKU</th><th>Brand / Produk</th><th>Kategori</th><th>Satuan</th><th>HPP</th><th>Harga Jual</th><th>Margin</th><th>% Margin</th><th>Stok</th><th>Aksi</th></tr></thead><tbody>${rows.map(p => `<tr><td><b>${esc(p.sku)}</b></td><td><b>${esc(p.brand)}</b><div class="muted">${esc(p.name)}</div></td><td>${esc(p.category)}</td><td>${esc(p.unit)}</td><td>${rupiah(p.hpp)}</td><td>${rupiah(p.price)}</td><td class="${margin(p) >= 0 ? 'positive' : 'negative'}">${rupiah(margin(p))}</td><td>${marginPct(p).toFixed(2)}%</td><td>${stockOf(p.id)} ${esc(p.unit)}</td><td><div class="actions"><button class="action" onclick="openProduct('${p.id}')">Edit</button><button class="action" onclick="deleteProduct('${p.id}')">Hapus</button></div></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Belum ada data barang. Tambahkan barang atau import file Excel.</div>' }
+        function deleteProduct(id) { if (!confirm('Hapus barang ini? Riwayat transaksi tetap tersimpan.')) return; db.products = db.products.filter(p => p.id !== id); save() }
+        function openMovement() { let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join(''); if (!opts) return alert('Tambahkan master barang terlebih dahulu.'); modal('Input Mutasi Stok', `<div class="formgrid">${selectRaw('Barang', 'mProduct', opts)}${field('Tanggal', 'mDate', today(), 'date')}${field('Barang Masuk (Qty)', 'mIn', 0, 'number', 'min="0"')}${field('Barang Keluar (Qty)', 'mOut', 0, 'number', 'min="0"')}<div class="formfield full"><label>Keterangan</label><input id="mDesc" placeholder="Pembelian, koreksi, retur, dll"></div></div>`, 'Simpan', () => { let a = num($('mIn').value), b = num($('mOut').value); if (a && b) return alert('Isi barang masuk atau barang keluar, bukan keduanya sekaligus.'); addMovement($('mProduct').value, $('mDate').value, a, b, $('mDesc').value || 'Mutasi manual'); save(); closeModal() }) }
+        function selectRaw(label, id, options) { return `<div class="formfield"><label>${label}</label><select id="${id}">${options}</select></div>` }
+        function renderStock() { let q = ($('stockSearch')?.value || '').toLowerCase(), from = $('stockFrom')?.value || '', to = $('stockTo')?.value || '', rows = db.movements.filter(m => { let p = product(m.productId); return p && (p.sku + ' ' + p.name).toLowerCase().includes(q) && (!from || m.date >= from) && (!to || m.date <= to) }).sort((a, b) => a.date.localeCompare(b.date)); let running = {}; $('stockTable').innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>Kode SKU</th><th>Nama Produk</th><th>Stock Awal*</th><th>Barang Masuk</th><th>Barang Keluar</th><th>Stock Akhir*</th><th>Keterangan</th></tr></thead><tbody>${rows.map(m => { let p = product(m.productId), before = running[m.productId] || 0, after = before + m.in - m.out; running[m.productId] = after; return `<tr><td>${esc(m.date)}</td><td>${esc(p.sku)}</td><td>${esc(p.name)}</td><td>${before}</td><td class="positive">${m.in || '—'}</td><td class="negative">${m.out || '—'}</td><td><b>${after}</b></td><td>${esc(m.desc)}</td></tr>` }).join('')}</tbody></table><div class="footer-note">*Stock awal/akhir dihitung dari mutasi yang tampil sesuai filter tanggal. Mutasi transaksi penjualan dan opname tercatat otomatis.</div>` : '<div class="empty">Belum ada mutasi stok.</div>' }
+        function openOpname() { if (!db.products.length) return alert('Tambahkan master barang terlebih dahulu.'); let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join(''); modal('Input Stock Opname', `<div class="formgrid">${selectRaw('Barang', 'oProduct', opts)}${field('Tanggal', 'oDate', today(), 'date')}<div class="formfield"><label>Stock Sistem</label><input id="oSystem" disabled></div>${field('Stock Fisik', 'oPhysical', 0, 'number', 'min="0"')}${selectField('Kondisi Barang', 'oCondition', ['Baik', 'Rusak', 'Expired', 'Hilang', 'Lainnya'])}<div class="formfield"><label>Tindakan / Catatan</label><input id="oNote" placeholder="Catatan pemeriksaan"></div></div><div class="notice">Jika disimpan, selisih akan dibuat sebagai mutasi penyesuaian agar stok sistem sama dengan stok fisik.</div>`, 'Simpan Opname', () => { let id = $('oProduct').value, sys = stockOf(id), phy = num($('oPhysical').value), diff = phy - sys; db.opnames.push({ id: uid(), productId: id, date: $('oDate').value, system: sys, physical: phy, diff, condition: $('oCondition').value, note: $('oNote').value }); if (diff > 0) addMovement(id, $('oDate').value, diff, 0, 'Penyesuaian stock opname: ' + $('oNote').value); if (diff < 0) addMovement(id, $('oDate').value, 0, -diff, 'Penyesuaian stock opname: ' + $('oNote').value); save(); closeModal() }); setTimeout(() => { $('oProduct').onchange = () => $('oSystem').value = stockOf($('oProduct').value); $('oSystem').value = stockOf(db.products[0].id) }, 0) }
+        function renderOpnames() { $('opnameTable').innerHTML = db.opnames.length ? `<table><thead><tr><th>Tanggal</th><th>SKU</th><th>Nama Produk</th><th>Stock Sistem</th><th>Stock Fisik</th><th>Selisih</th><th>Kondisi</th><th>Tindakan/Catatan</th></tr></thead><tbody>${db.opnames.slice().reverse().map(o => { let p = product(o.productId); return `<tr><td>${esc(o.date)}</td><td>${esc(p?.sku || '-')}</td><td>${esc(p?.name || '-')}</td><td>${o.system}</td><td>${o.physical}</td><td class="${o.diff >= 0 ? 'positive' : 'negative'}">${o.diff > 0 ? '+' : ''}${o.diff}</td><td><span class="pill ${o.condition === 'Baik' ? 'green' : 'amber'}">${esc(o.condition)}</span></td><td>${esc(o.note)}</td></tr>` }).join('')}</tbody></table>` : '<div class="empty">Belum ada data stock opname.</div>' }
+        function openSale() { if (!db.products.length) return alert('Tambahkan master barang terlebih dahulu.'); let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)} (${rupiah(p.price)})</option>`).join(''); modal('Input Penjualan Harian', `<div class="formgrid">${field('Tanggal', 'sDate', today(), 'date')}${field('No. Transaksi', 'sNo', 'TRX-' + Date.now().toString().slice(-6))}${selectRaw('Nama Barang', 'sProduct', opts)}${field('QTY', 'sQty', 1, 'number', 'min="1"')}${field('Harga Satuan (otomatis)', 'sPrice', db.products[0].price, 'number', 'min="0"')}${field('Total', 'sTotal', rupiah(db.products[0].price))}${selectField('Metode Bayar', 'sMethod', ['Tunai', 'QRIS', 'Transfer', 'Debit', 'Kredit'])}</div><div class="notice">Harga satuan otomatis mengikuti Harga Jual di Master Data Barang.</div>`, 'Simpan Transaksi', () => { let p = product($('sProduct').value), qty = num($('sQty').value); if (!p || qty <= 0) return alert('Pilih barang dan isi QTY lebih dari 0.'); if (stockOf(p.id) < qty && !confirm('Stok sistem kurang dari jumlah penjualan. Tetap simpan?')) return; let sale = { id: uid(), date: $('sDate').value, no: $('sNo').value, productId: p.id, qty, price: num($('sPrice').value), total: qty * num($('sPrice').value), method: $('sMethod').value }; db.sales.push(sale); addMovement(p.id, sale.date, 0, qty, 'Penjualan ' + sale.no, sale.no); save(); closeModal() }); setTimeout(() => { let update = () => { let p = product($('sProduct').value); $('sPrice').value = p?.price || 0; $('sTotal').value = rupiah(num($('sQty').value) * num($('sPrice').value)) }; $('sProduct').onchange = update; $('sQty').oninput = update; $('sPrice').oninput = update }, 0) }
+        function renderSales() { let q = ($('saleSearch')?.value || '').toLowerCase(), d = $('saleDate')?.value || '', rows = db.sales.filter(s => { let p = product(s.productId); return (s.no + ' ' + (p?.name || '')).toLowerCase().includes(q) && (!d || s.date === d) }).slice().reverse(); $('salesTable').innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>No. Trx</th><th>Nama Barang</th><th>QTY</th><th>Harga Satuan</th><th>Total</th><th>Metode Bayar</th><th>Aksi</th></tr></thead><tbody>${rows.map(s => { let p = product(s.productId); return `<tr><td>${s.date}</td><td><b>${esc(s.no)}</b></td><td>${esc(p?.name || 'Barang dihapus')}</td><td>${s.qty}</td><td>${rupiah(s.price)}</td><td><b>${rupiah(s.total)}</b></td><td><span class="pill ${s.method === 'Tunai' ? 'green' : s.method === 'Bon' ? 'amber' : ''}">${esc(s.method)}</span></td><td><button class="action" onclick="deleteSale('${s.id}')">Hapus</button></td></tr>` }).join('')}</tbody></table>` : '<div class="empty">Belum ada transaksi penjualan.</div>' }
+        function deleteSale(id) { let s = db.sales.find(x => x.id === id); if (!s || !confirm('Hapus transaksi ini? Stok akan dikembalikan.')) return; db.sales = db.sales.filter(x => x.id !== id); let m = db.movements.find(x => x.ref === s.no && x.desc === 'Penjualan ' + s.no); if (m) db.movements = db.movements.filter(x => x.id !== m.id); save() }
 
         let logTab = 'log';
         const logConfig = {
-          log: {key:'logbooks',title:'Logbook Harian',fields:[['date','Tanggal','date'],['shift','Shift / Jam','text'],['focus','Fokus Utama Hari Ini','textarea'],['issues','Kendala / Isu','textarea'],['decisions','Keputusan / Tindakan','textarea'],['todos','To-Do List','textarea'],['initials','Paraf','text']]},
-          eval: {key:'evaluations',title:'Evaluasi Staff',fields:[['date','Tanggal','date'],['employee','Nama Karyawan','text'],['aspect','Aspek Penilaian','text'],['notes','Catatan Kinerja / Perilaku','textarea'],['feedback','Tindakan / Feedback','textarea'],['status','Status','status']]},
-          dev: {key:'devplans',title:'Personal Dev Plan',fields:[['competency','Fokus / Kompetensi','text'],['target','Target 3 Bulan','textarea'],['action','Action Plan','textarea'],['indicator','Indikator Keberhasilan','textarea'],['status','Status','status']]}
+            log: { key: 'logbooks', title: 'Logbook Harian', fields: [['date', 'Tanggal', 'date'], ['shift', 'Shift / Jam', 'text'], ['focus', 'Fokus Utama Hari Ini', 'textarea'], ['issues', 'Kendala / Isu', 'textarea'], ['decisions', 'Keputusan / Tindakan', 'textarea'], ['todos', 'To-Do List', 'textarea'], ['initials', 'Paraf', 'text']] },
+            eval: { key: 'evaluations', title: 'Evaluasi Staff', fields: [['date', 'Tanggal', 'date'], ['employee', 'Nama Karyawan', 'text'], ['aspect', 'Aspek Penilaian', 'text'], ['notes', 'Catatan Kinerja / Perilaku', 'textarea'], ['feedback', 'Tindakan / Feedback', 'textarea'], ['status', 'Status', 'status']] },
+            dev: { key: 'devplans', title: 'Personal Dev Plan', fields: [['competency', 'Fokus / Kompetensi', 'text'], ['target', 'Target 3 Bulan', 'textarea'], ['action', 'Action Plan', 'textarea'], ['indicator', 'Indikator Keberhasilan', 'textarea'], ['status', 'Status', 'status']] }
         };
-        function setLogTab(tab){logTab=tab;['log','eval','dev'].forEach((t,i)=>{let b=$( ['tabLog','tabEval','tabDev'][i]);b.className='btn'+(tab===t?' primary':'')});renderLogbook()}
-        function logInput(f,value){let [key,label,type]=f, val=esc(value??(type==='date'?today():''));if(type==='textarea')return `<div class="formfield full"><label>${label}</label><textarea id="l_${key}" rows="3">${val}</textarea></div>`;if(type==='status')return `<div class="formfield"><label>${label}</label><select id="l_${key}">${['Belum Dimulai','Dalam Proses','Selesai','Perlu Tindak Lanjut'].map(o=>`<option ${o===value?'selected':''}>${o}</option>`).join('')}</select></div>`;return field(label,'l_'+key,val,type)}
-        function openLogEntry(id=''){let c=logConfig[logTab],item=db[c.key].find(x=>x.id===id)||{};modal((id?'Edit ':'Tambah ')+c.title,`<div class="formgrid">${c.fields.map(f=>logInput(f,item[f[0]])).join('')}</div>`,'Simpan',()=>{let obj={...item,id:id||uid()};for(let [key,label] of c.fields){obj[key]=$('l_'+key).value.trim()}if(c.fields.some(f=>!obj[f[0]]))return alert('Lengkapi seluruh kolom terlebih dahulu.');if(id){let i=db[c.key].findIndex(x=>x.id===id);db[c.key][i]=obj}else db[c.key].push(obj);save();closeModal()})}
-        function deleteLogEntry(id){let c=logConfig[logTab];if(!confirm('Hapus data ini?'))return;db[c.key]=db[c.key].filter(x=>x.id!==id);save()}
-        function renderLogbook(){let c=logConfig[logTab],q=($('logSearch')?.value||'').toLowerCase(),rows=db[c.key].filter(x=>Object.values(x).join(' ').toLowerCase().includes(q));$('logTable').innerHTML=rows.length?`<table><thead><tr>${c.fields.map(f=>`<th>${f[1]}</th>`).join('')}<th>Aksi</th></tr></thead><tbody>${rows.slice().reverse().map(x=>`<tr>${c.fields.map(f=>`<td style="max-width:280px;white-space:normal">${esc(x[f[0]])}</td>`).join('')}<td><div class="actions"><button class="action" onclick="openLogEntry('${x.id}')">Edit</button><button class="action" onclick="deleteLogEntry('${x.id}')">Hapus</button></div></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Belum ada catatan. Klik Tambah Data untuk memulai.</div>'}
-        function exportLogbook(){let c=logConfig[logTab],rows=db[c.key].map(x=>Object.fromEntries(c.fields.map(f=>[f[1],x[f[0]]])));exportRows(rows,c.title.replaceAll(' ','_')+'.xlsx',c.title)}
+        function setLogTab(tab) { logTab = tab;['log', 'eval', 'dev'].forEach((t, i) => { let b = $(['tabLog', 'tabEval', 'tabDev'][i]); b.className = 'btn' + (tab === t ? ' primary' : '') }); renderLogbook() }
+        function logInput(f, value) { let [key, label, type] = f, val = esc(value ?? (type === 'date' ? today() : '')); if (type === 'textarea') return `<div class="formfield full"><label>${label}</label><textarea id="l_${key}" rows="3">${val}</textarea></div>`; if (type === 'status') return `<div class="formfield"><label>${label}</label><select id="l_${key}">${['Belum Dimulai', 'Dalam Proses', 'Selesai', 'Perlu Tindak Lanjut'].map(o => `<option ${o === value ? 'selected' : ''}>${o}</option>`).join('')}</select></div>`; return field(label, 'l_' + key, val, type) }
+        function openLogEntry(id = '') { let c = logConfig[logTab], item = db[c.key].find(x => x.id === id) || {}; modal((id ? 'Edit ' : 'Tambah ') + c.title, `<div class="formgrid">${c.fields.map(f => logInput(f, item[f[0]])).join('')}</div>`, 'Simpan', () => { let obj = { ...item, id: id || uid() }; for (let [key, label] of c.fields) { obj[key] = $('l_' + key).value.trim() } if (c.fields.some(f => !obj[f[0]])) return alert('Lengkapi seluruh kolom terlebih dahulu.'); if (id) { let i = db[c.key].findIndex(x => x.id === id); db[c.key][i] = obj } else db[c.key].push(obj); save(); closeModal() }) }
+        function deleteLogEntry(id) { let c = logConfig[logTab]; if (!confirm('Hapus data ini?')) return; db[c.key] = db[c.key].filter(x => x.id !== id); save() }
+        function renderLogbook() { let c = logConfig[logTab], q = ($('logSearch')?.value || '').toLowerCase(), rows = db[c.key].filter(x => Object.values(x).join(' ').toLowerCase().includes(q)); $('logTable').innerHTML = rows.length ? `<table><thead><tr>${c.fields.map(f => `<th>${f[1]}</th>`).join('')}<th>Aksi</th></tr></thead><tbody>${rows.slice().reverse().map(x => `<tr>${c.fields.map(f => `<td style="max-width:280px;white-space:normal">${esc(x[f[0]])}</td>`).join('')}<td><div class="actions"><button class="action" onclick="openLogEntry('${x.id}')">Edit</button><button class="action" onclick="deleteLogEntry('${x.id}')">Hapus</button></div></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Belum ada catatan. Klik Tambah Data untuk memulai.</div>' }
+        function exportLogbook() { let c = logConfig[logTab], rows = db[c.key].map(x => Object.fromEntries(c.fields.map(f => [f[1], x[f[0]]]))); exportRows(rows, c.title.replaceAll(' ', '_') + '.xlsx', c.title) }
 
-        function salesForMonth(m) {return db.sales.filter(s => s.date.startsWith(m))}
-        function renderRecap() {let m = $('monthFilter').value || today().slice(0, 7), rows = salesForMonth(m), cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + s.total, 0), non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + s.total, 0), total = rows.reduce((a, s) => a + s.total, 0), profit = rows.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0), trx = new Set(rows.map(s => s.no)).size; $('recapCards').innerHTML = statCard('Total Transaksi', trx, '▤') + statCard('Omzet Tunai', rupiah(cash), '◉') + statCard('Omzet Non-Tunai', rupiah(non), '▣') + statCard('Total Omzet', rupiah(total), '↗'); $('recapTable').innerHTML = `<table><thead><tr><th>Periode</th><th>Total Transaksi</th><th>Omzet Tunai</th><th>Omzet Non-Tunai</th><th>Total Omzet</th><th>Est. Profit</th></tr></thead><tbody><tr><td>${m}</td><td>${trx}</td><td>${rupiah(cash)}</td><td>${rupiah(non)}</td><td><b>${rupiah(total)}</b></td><td class="positive">${rupiah(profit)}</td></tr></tbody></table><div class="footer-note">Est. Profit = total penjualan − (QTY × HPP saat ini). Transaksi non-tunai mencakup QRIS, transfer, debit, dan kredit.</div>`}
-        function statCard(label, val, ic) {return `<div class="stat"><div class="stat-top">${label}<span class="stat-icon">${ic}</span></div><div class="stat-value">${val}</div></div>`}
-        function renderDashboard() {let total = db.sales.reduce((a, s) => a + s.total, 0), profit = db.sales.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0), units = db.products.length; $('dashCards').innerHTML = statCard('Total Omzet', rupiah(total), '↗') + statCard('Estimasi Profit', rupiah(profit), '◈') + statCard('Logbook Harian', db.logbooks.length, '✎') + statCard('Jenis Barang', units, '▤'); let recent = db.sales.slice().reverse().slice(0, 5); $('recentSales').innerHTML = recent.length ? recent.map(s => `<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px"><div><b>${esc(s.no)}</b><div class="muted">${s.date} · ${esc(product(s.productId)?.name || '-')}</div></div><b>${rupiah(s.total)}</b></div>`).join('') : '<div class="empty">Belum ada transaksi.</div>'; let low = db.products.filter(p => stockOf(p.id) <= 5); $('lowStock').innerHTML = low.length ? `<table><thead><tr><th>SKU</th><th>Produk</th><th>Stok</th><th>Status</th></tr></thead><tbody>${low.map(p => `<tr><td>${p.sku}</td><td>${p.name}</td><td>${stockOf(p.id)} ${p.unit}</td><td><span class="pill red">Stok rendah</span></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Tidak ada barang dengan stok rendah.</div>'; drawChart()}
-        let chart; function drawChart() {let c = $('salesChart'); if (!c || !window.Chart) return; let labels = [], data = []; for (let i = 6; i >= 0; i--) {let d = new Date(); d.setDate(d.getDate() - i); let key = d.toISOString().slice(0, 10); labels.push(key.slice(5)); data.push(db.sales.filter(s => s.date === key).reduce((a, s) => a + s.total, 0))} if (chart) chart.destroy(); chart = new Chart(c, {type: 'bar', data: {labels, datasets: [{label: 'Omzet', data, borderRadius: 6, backgroundColor: '#6683f4'}]}, options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}}, scales: {y: {ticks: {callback: v => 'Rp ' + (v / 1000) + 'k'}, grid: {color: '#eff2f6'}}, x: {grid: {display: false}}}}})}
-        function renderAll() {renderProducts(); renderStock(); renderOpnames(); renderSales(); renderLogbook(); renderRecap(); renderDashboard()}
+        function salesForMonth(m) { return db.sales.filter(s => s.date.startsWith(m)) }
+        function renderRecap() { let m = $('monthFilter').value || today().slice(0, 7), rows = salesForMonth(m), cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + s.total, 0), non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + s.total, 0), total = rows.reduce((a, s) => a + s.total, 0), profit = rows.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0), trx = new Set(rows.map(s => s.no)).size; $('recapCards').innerHTML = statCard('Total Transaksi', trx, '▤') + statCard('Omzet Tunai', rupiah(cash), '◉') + statCard('Omzet Non-Tunai', rupiah(non), '▣') + statCard('Total Omzet', rupiah(total), '↗'); $('recapTable').innerHTML = `<table><thead><tr><th>Periode</th><th>Total Transaksi</th><th>Omzet Tunai</th><th>Omzet Non-Tunai</th><th>Total Omzet</th><th>Est. Profit</th></tr></thead><tbody><tr><td>${m}</td><td>${trx}</td><td>${rupiah(cash)}</td><td>${rupiah(non)}</td><td><b>${rupiah(total)}</b></td><td class="positive">${rupiah(profit)}</td></tr></tbody></table><div class="footer-note">Est. Profit = total penjualan − (QTY × HPP saat ini). Transaksi non-tunai mencakup QRIS, transfer, debit, dan kredit.</div>` }
+        function statCard(label, val, ic) { return `<div class="stat"><div class="stat-top">${label}<span class="stat-icon">${ic}</span></div><div class="stat-value">${val}</div></div>` }
+        function renderDashboard() { let total = db.sales.reduce((a, s) => a + s.total, 0), profit = db.sales.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0), units = db.products.length; $('dashCards').innerHTML = statCard('Total Omzet', rupiah(total), '↗') + statCard('Estimasi Profit', rupiah(profit), '◈') + statCard('Logbook Harian', db.logbooks.length, '✎') + statCard('Jenis Barang', units, '▤'); let recent = db.sales.slice().reverse().slice(0, 5); $('recentSales').innerHTML = recent.length ? recent.map(s => `<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px"><div><b>${esc(s.no)}</b><div class="muted">${s.date} · ${esc(product(s.productId)?.name || '-')}</div></div><b>${rupiah(s.total)}</b></div>`).join('') : '<div class="empty">Belum ada transaksi.</div>'; let low = db.products.filter(p => stockOf(p.id) <= 5); $('lowStock').innerHTML = low.length ? `<table><thead><tr><th>SKU</th><th>Produk</th><th>Stok</th><th>Status</th></tr></thead><tbody>${low.map(p => `<tr><td>${p.sku}</td><td>${p.name}</td><td>${stockOf(p.id)} ${p.unit}</td><td><span class="pill red">Stok rendah</span></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Tidak ada barang dengan stok rendah.</div>'; drawChart() }
+        let chart; function drawChart() { let c = $('salesChart'); if (!c || !window.Chart) return; let labels = [], data = []; for (let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(d.getDate() - i); let key = d.toISOString().slice(0, 10); labels.push(key.slice(5)); data.push(db.sales.filter(s => s.date === key).reduce((a, s) => a + s.total, 0)) } if (chart) chart.destroy(); chart = new Chart(c, { type: 'bar', data: { labels, datasets: [{ label: 'Omzet', data, borderRadius: 6, backgroundColor: '#6683f4' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => 'Rp ' + (v / 1000) + 'k' }, grid: { color: '#eff2f6' } }, x: { grid: { display: false } } } } }) }
+        function renderAll() { renderProducts(); renderStock(); renderOpnames(); renderSales(); renderLogbook(); renderRecap(); renderDashboard() }
         function downloadTemplate() {
             if (!window.XLSX) return alert('Library Excel belum termuat. Periksa koneksi internet.'); let wb = XLSX.utils.book_new(); let sheets = {
                 'Master Barang': [['Kode SKU', 'Brand', 'Nama Produk', 'Kategori', 'Satuan', 'HPP', 'Harga Jual'], ['SKU001', 'Bango', 'Bango Kecap Manis 950 GR', 'Makanan', 'Pcs', 36500, 45000], ['SKU002', 'Bango', 'Bango Soy Sauce', 'Makanan', 'Pcs', 28000, 35000]],
                 'Stock Card': [['Tanggal', 'Kode SKU', 'Barang Masuk', 'Barang Keluar', 'Keterangan'], ['2026-11-01', 'SKU001', 20, 0, 'Saldo awal'], ['2026-11-02', 'SKU001', 0, 2, 'Penjualan']],
                 'Stock Opname': [['Tanggal', 'Kode SKU', 'Stock Fisik', 'Kondisi Barang', 'Tindakan/Catatan'], ['2026-11-06', 'SKU001', 18, 'Baik', 'Stok sesuai']],
-                'Penjualan': [['Tanggal', 'No. Trx', 'Waktu', 'Kode SKU', 'QTY', 'Metode Bayar'], ['2026-11-06', 'TRX001', '09:00', 'SKU001', 2, 'Tunai']],
-                'Logbook Harian': [['Tanggal','Shift / Jam','Fokus Utama Hari Ini','Kendala / Isu','Keputusan / Tindakan','To-Do List','Paraf']],
-                'Evaluasi Staff': [['Tanggal','Nama Karyawan','Aspek Penilaian','Catatan Kinerja / Perilaku','Tindakan / Feedback','Status']],
-                'Personal Dev Plan': [['Fokus / Kompetensi','Target 3 Bulan','Action Plan','Indikator Keberhasilan','Status']]
-            }; Object.entries(sheets).forEach(([n, a]) => {let ws = XLSX.utils.aoa_to_sheet(a); ws['!cols'] = a[0].map((_, i) => ({wch: Math.max(16, ...a.map(r => String(r[i] ?? '').length + 2))})); XLSX.utils.book_append_sheet(wb, ws, n)}); XLSX.writeFile(wb, 'Template_Import_KDKMP.xlsx')
+                'Penjualan': [['Tanggal', 'No. Trx', 'Kode SKU', 'QTY', 'Metode Bayar'], ['2026-11-06', 'TRX001', 'SKU001', 2, 'Tunai']],
+                'Logbook Harian': [['Tanggal', 'Shift / Jam', 'Fokus Utama Hari Ini', 'Kendala / Isu', 'Keputusan / Tindakan', 'To-Do List', 'Paraf']],
+                'Evaluasi Staff': [['Tanggal', 'Nama Karyawan', 'Aspek Penilaian', 'Catatan Kinerja / Perilaku', 'Tindakan / Feedback', 'Status']],
+                'Personal Dev Plan': [['Fokus / Kompetensi', 'Target 3 Bulan', 'Action Plan', 'Indikator Keberhasilan', 'Status']]
+            }; Object.entries(sheets).forEach(([n, a]) => { let ws = XLSX.utils.aoa_to_sheet(a); ws['!cols'] = a[0].map((_, i) => ({ wch: Math.max(16, ...a.map(r => String(r[i] ?? '').length + 2)) })); XLSX.utils.book_append_sheet(wb, ws, n) }); XLSX.writeFile(wb, 'Template_Import_KDKMP.xlsx')
         }
-        function importExcel(e) {let f = e.target.files[0]; if (!f) return; let r = new FileReader(); r.onload = ev => {try {let wb = XLSX.read(ev.target.result, {type: 'array'}), ws = wb.Sheets[wb.SheetNames[0]], rows = XLSX.utils.sheet_to_json(ws, {defval: ''}); let added = 0; rows.forEach(x => {let sku = String(x['Kode SKU'] || x['SKU'] || '').trim(), name = String(x['Nama Produk'] || '').trim(); if (!sku || !name) return; let p = {id: uid(), sku, brand: String(x.Brand || ''), name, category: String(x.Kategori || ''), unit: String(x.Satuan || 'Pcs'), hpp: num(x.HPP), price: num(x['Harga Jual'])}; let old = db.products.findIndex(y => y.sku.toLowerCase() === sku.toLowerCase()); if (old >= 0) {p.id = db.products[old].id; db.products[old] = p} else {db.products.push(p); added++} }); save(); alert(`Import selesai. ${rows.length} baris dibaca, ${added} barang baru ditambahkan. SKU yang sudah ada diperbarui.`)} catch (err) {alert('Gagal membaca file. Pastikan menggunakan template Excel KDKMP.')} e.target.value = ''}; r.readAsArrayBuffer(f)}
-        function exportProducts() {let rows = db.products.map(p => ({'Kode SKU': p.sku, Brand: p.brand, 'Nama Produk': p.name, Kategori: p.category, Satuan: p.unit, HPP: p.hpp, 'Harga Jual': p.price, Margin: margin(p), 'Persentase Margin': marginPct(p).toFixed(2) + '%'})); exportRows(rows, 'Master_Barang.xlsx', 'Barang')}
-        function exportSales() {exportRows(db.sales.map(s => ({'Tanggal': s.date, 'No. Trx': s.no, Waktu: s.time, 'Kode SKU': product(s.productId)?.sku || '', 'Nama Produk': product(s.productId)?.name || '', QTY: s.qty, 'Harga Satuan': s.price, Total: s.total, 'Metode Bayar': s.method})), 'Penjualan.xlsx', 'Penjualan')}
-        function exportRecap() {let m = $('monthFilter').value || today().slice(0, 7), rows = salesForMonth(m), cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + s.total, 0), non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + s.total, 0), total = rows.reduce((a, s) => a + s.total, 0), profit = rows.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0); exportRows([{'Periode': m, 'Total Transaksi': new Set(rows.map(s => s.no)).size, 'Omzet Tunai': cash, 'Omzet Non-Tunai': non, 'Total Omzet': total, 'Est. Profit': profit}], 'Rekap_Bulanan.xlsx', 'Rekap')}
-        function exportRows(rows, file, sheet) {if (!rows.length) return alert('Tidak ada data untuk diekspor.'); let ws = XLSX.utils.json_to_sheet(rows), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheet); XLSX.writeFile(wb, file)}
-        function exportCSV() {let rows = db.products.map(p => [p.sku, p.brand, p.name, p.category, p.unit, p.hpp, p.price, margin(p), marginPct(p)]), csv = [['Kode SKU', 'Brand', 'Nama Produk', 'Kategori', 'Satuan', 'HPP', 'Harga Jual', 'Margin', 'Persentase Margin'], ...rows].map(r => r.join(';')).join('\n'); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8'})); a.download = 'Master_Barang.csv'; a.click()}
-        $('today').textContent = new Date().toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'}); $('monthFilter').value = today().slice(0, 7); renderAll();
+        function importExcel(e) { let f = e.target.files[0]; if (!f) return; let r = new FileReader(); r.onload = ev => { try { let wb = XLSX.read(ev.target.result, { type: 'array' }), ws = wb.Sheets[wb.SheetNames[0]], rows = XLSX.utils.sheet_to_json(ws, { defval: '' }); let added = 0; rows.forEach(x => { let sku = String(x['Kode SKU'] || x['SKU'] || '').trim(), name = String(x['Nama Produk'] || '').trim(); if (!sku || !name) return; let p = { id: uid(), sku, brand: String(x.Brand || ''), name, category: String(x.Kategori || ''), unit: String(x.Satuan || 'Pcs'), hpp: num(x.HPP), price: num(x['Harga Jual']) }; let old = db.products.findIndex(y => y.sku.toLowerCase() === sku.toLowerCase()); if (old >= 0) { p.id = db.products[old].id; db.products[old] = p } else { db.products.push(p); added++ } }); save(); alert(`Import selesai. ${rows.length} baris dibaca, ${added} barang baru ditambahkan. SKU yang sudah ada diperbarui.`) } catch (err) { alert('Gagal membaca file. Pastikan menggunakan template Excel KDKMP.') } e.target.value = '' }; r.readAsArrayBuffer(f) }
+        function exportProducts() { let rows = db.products.map(p => ({ 'Kode SKU': p.sku, Brand: p.brand, 'Nama Produk': p.name, Kategori: p.category, Satuan: p.unit, HPP: p.hpp, 'Harga Jual': p.price, Margin: margin(p), 'Persentase Margin': marginPct(p).toFixed(2) + '%' })); exportRows(rows, 'Master_Barang.xlsx', 'Barang') }
+        function exportSales() { exportRows(db.sales.map(s => ({ 'Tanggal': s.date, 'No. Trx': s.no, 'Kode SKU': product(s.productId)?.sku || '', 'Nama Produk': product(s.productId)?.name || '', QTY: s.qty, 'Harga Satuan': s.price, Total: s.total, 'Metode Bayar': s.method })), 'Penjualan.xlsx', 'Penjualan') }
+        function exportRecap() { let m = $('monthFilter').value || today().slice(0, 7), rows = salesForMonth(m), cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + s.total, 0), non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + s.total, 0), total = rows.reduce((a, s) => a + s.total, 0), profit = rows.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0); exportRows([{ 'Periode': m, 'Total Transaksi': new Set(rows.map(s => s.no)).size, 'Omzet Tunai': cash, 'Omzet Non-Tunai': non, 'Total Omzet': total, 'Est. Profit': profit }], 'Rekap_Bulanan.xlsx', 'Rekap') }
+        function exportRows(rows, file, sheet) { if (!rows.length) return alert('Tidak ada data untuk diekspor.'); let ws = XLSX.utils.json_to_sheet(rows), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheet); XLSX.writeFile(wb, file) }
+        function exportCSV() { let rows = db.products.map(p => [p.sku, p.brand, p.name, p.category, p.unit, p.hpp, p.price, margin(p), marginPct(p)]), csv = [['Kode SKU', 'Brand', 'Nama Produk', 'Kategori', 'Satuan', 'HPP', 'Harga Jual', 'Margin', 'Persentase Margin'], ...rows].map(r => r.join(';')).join('\n'); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })); a.download = 'Master_Barang.csv'; a.click() }
+        $('today').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); $('monthFilter').value = today().slice(0, 7); renderAll();
     </script>
 </body>
 
