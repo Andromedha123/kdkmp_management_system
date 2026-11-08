@@ -918,6 +918,17 @@
                 <div class="panel">
                     <div class="panel-head">
                         <div>
+                            <h3>Top Product Performance</h3>
+                            <div class="sub" id="dashTopProductSubtitle">5 produk dengan omzet tertinggi pada bulan berjalan</div>
+                        </div>
+                        <button class="btn" onclick="showPage('rekap')">Lihat Rekap Bulanan</button>
+                    </div>
+                    <div class="table-wrap" id="dashTopProductPerformance"></div>
+                    <div class="footer-note">Peringkat berdasarkan revenue. Frekuensi transaksi menghitung jumlah nomor transaksi berbeda yang memuat produk.</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head">
+                        <div>
                             <h3>Stok Menipis</h3>
                             <div class="sub">Barang dengan stok 5 unit atau kurang</div>
                         </div><button class="btn" onclick="showPage('barang')">Lihat barang</button>
@@ -1050,10 +1061,21 @@
                         </div>
                         <div class="btnline"><input type="month" id="monthFilter" style="width:155px"
                                 onchange="renderRecap()"><button class="btn" onclick="exportRecap()">Export
-                                Excel</button></div>
+                                Excel</button><button class="btn primary" onclick="exportRecapPDF()">↓ Save to PDF</button></div>
                     </div>
                     <div class="cards" id="recapCards"></div>
                     <div class="table-wrap" id="recapTable"></div>
+                    <div class="panel" style="margin-top:18px;box-shadow:none;border:1px solid var(--line)">
+                        <div class="panel-head">
+                            <div>
+                                <h3>Top Product Performance</h3>
+                                <div class="sub">Peringkat produk berdasarkan omzet pada periode terpilih</div>
+                            </div>
+                            <span class="pill">Top 5 Produk</span>
+                        </div>
+                        <div class="table-wrap" id="topProductPerformance"></div>
+                        <div class="footer-note">Frekuensi Transaksi menunjukkan jumlah nomor transaksi berbeda yang memuat produk tersebut. Aplikasi belum merekam aktivitas Add to Cart secara terpisah.</div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -1370,9 +1392,132 @@
         function exportLogbook() { let c = logConfig[logTab], rows = db[c.key].map(x => Object.fromEntries(c.fields.map(f => [f[1], x[f[0]]]))); exportRows(rows, c.title.replaceAll(' ', '_') + '.xlsx', c.title) }
 
         function salesForMonth(m) { return db.sales.filter(s => s.date.startsWith(m)) }
-        function renderRecap() { let m = $('monthFilter').value || today().slice(0, 7), rows = salesForMonth(m), cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + s.total, 0), non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + s.total, 0), total = rows.reduce((a, s) => a + s.total, 0), profit = rows.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0), trx = new Set(rows.map(s => s.no)).size; $('recapCards').innerHTML = statCard('Total Transaksi', trx, '▤') + statCard('Omzet Tunai', rupiah(cash), '◉') + statCard('Omzet Non-Tunai', rupiah(non), '▣') + statCard('Total Omzet', rupiah(total), '↗'); $('recapTable').innerHTML = `<table><thead><tr><th>Periode</th><th>Total Transaksi</th><th>Omzet Tunai</th><th>Omzet Non-Tunai</th><th>Total Omzet</th><th>Est. Profit</th></tr></thead><tbody><tr><td>${m}</td><td>${trx}</td><td>${rupiah(cash)}</td><td>${rupiah(non)}</td><td><b>${rupiah(total)}</b></td><td class="positive">${rupiah(profit)}</td></tr></tbody></table><div class="footer-note">Est. Profit = total penjualan − (QTY × HPP saat ini). Transaksi non-tunai mencakup QRIS, transfer, debit, dan kredit.</div>` }
+        function renderRecap() {
+            let m = $('monthFilter').value || today().slice(0, 7);
+            let rows = salesForMonth(m);
+            let cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + num(s.total), 0);
+            let non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + num(s.total), 0);
+            let total = rows.reduce((a, s) => a + num(s.total), 0);
+            let profit = rows.reduce((a, s) => a + num(s.total) - num(product(s.productId)?.hpp) * num(s.qty), 0);
+            let trx = new Set(rows.map(s => s.no)).size;
+
+            $('recapCards').innerHTML =
+                statCard('Total Transaksi', trx, '▤') +
+                statCard('Omzet Tunai', rupiah(cash), '◉') +
+                statCard('Omzet Non-Tunai', rupiah(non), '▣') +
+                statCard('Total Omzet', rupiah(total), '↗');
+
+            $('recapTable').innerHTML = `<table><thead><tr>
+                <th>Periode</th><th>Total Transaksi</th><th>Omzet Tunai</th>
+                <th>Omzet Non-Tunai</th><th>Total Omzet</th><th>Est. Profit</th>
+            </tr></thead><tbody><tr>
+                <td>${esc(m)}</td><td>${trx}</td><td>${rupiah(cash)}</td>
+                <td>${rupiah(non)}</td><td><b>${rupiah(total)}</b></td>
+                <td class="positive">${rupiah(profit)}</td>
+            </tr></tbody></table>
+            <div class="footer-note">Est. Profit = total penjualan − (QTY × HPP saat ini). Transaksi non-tunai mencakup QRIS, transfer, debit, dan kredit.</div>`;
+
+            const performance = {};
+            rows.forEach(s => {
+                const p = product(s.productId);
+                const key = s.productId || s.no;
+                if (!performance[key]) performance[key] = {
+                    sku: p?.sku || '-',
+                    name: p?.name || 'Barang tidak ditemukan',
+                    transactionNos: new Set(),
+                    qty: 0,
+                    revenue: 0
+                };
+                performance[key].transactionNos.add(s.no);
+                performance[key].qty += num(s.qty);
+                performance[key].revenue += num(s.total);
+            });
+
+            const topProducts = Object.values(performance)
+                .sort((a, b) => b.revenue - a.revenue)
+                .slice(0, 5);
+
+            $('topProductPerformance').innerHTML = topProducts.length ? `
+                <table>
+                    <thead><tr>
+                        <th>Produk</th><th class="right">Frekuensi Transaksi</th>
+                        <th class="right">Qty Terjual</th><th class="right">Revenue</th>
+                    </tr></thead>
+                    <tbody>${topProducts.map((p, index) => `
+                        <tr>
+                            <td><div style="display:flex;align-items:center;gap:9px">
+                                <span class="pill">${index + 1}</span>
+                                <div><b>${esc(p.name)}</b><div class="muted" style="font-size:10px">${esc(p.sku)}</div></div>
+                            </div></td>
+                            <td class="right">${p.transactionNos.size.toLocaleString('id-ID')}</td>
+                            <td class="right">${p.qty.toLocaleString('id-ID')}</td>
+                            <td class="right"><b>${rupiah(p.revenue)}</b></td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>` : '<div class="empty">Belum ada data penjualan untuk ditampilkan.</div>';
+        }
         function statCard(label, val, ic) { return `<div class="stat"><div class="stat-top">${label}<span class="stat-icon">${ic}</span></div><div class="stat-value">${val}</div></div>` }
-        function renderDashboard() { let total = db.sales.reduce((a, s) => a + s.total, 0), profit = db.sales.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0), units = db.products.length; $('dashCards').innerHTML = statCard('Total Omzet', rupiah(total), '↗') + statCard('Estimasi Profit', rupiah(profit), '◈') + statCard('Logbook Harian', db.logbooks.length, '✎') + statCard('Jenis Barang', units, '▤'); let recent = db.sales.slice().reverse().slice(0, 5); $('recentSales').innerHTML = recent.length ? recent.map(s => `<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px"><div><b>${esc(s.no)}</b><div class="muted">${s.date} · ${esc(product(s.productId)?.name || '-')}</div></div><b>${rupiah(s.total)}</b></div>`).join('') : '<div class="empty">Belum ada transaksi.</div>'; let low = db.products.filter(p => stockOf(p.id) <= num(p.minStock)); $('lowStock').innerHTML = low.length ? `<table><thead><tr><th>SKU</th><th>Produk</th><th>Stok</th><th>Stock Minimal</th><th>Status</th></tr></thead><tbody>${low.map(p => `<tr><td>${p.sku}</td><td>${p.name}</td><td>${stockOf(p.id)} ${p.unit}</td><td>${num(p.minStock)} ${p.unit}</td><td><span class="stock-warning">⚠ Stok Menipis</span></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Tidak ada barang dengan stok rendah.</div>'; drawChart() }
+        function renderDashboard() {
+            let total = db.sales.reduce((a, s) => a + num(s.total), 0);
+            let profit = db.sales.reduce((a, s) => a + num(s.total) - num(product(s.productId)?.hpp) * num(s.qty), 0);
+            let units = db.products.length;
+            $('dashCards').innerHTML =
+                statCard('Total Omzet', rupiah(total), '↗') +
+                statCard('Estimasi Profit', rupiah(profit), '◈') +
+                statCard('Logbook Harian', db.logbooks.length, '✎') +
+                statCard('Jenis Barang', units, '▤');
+
+            let recent = db.sales.slice().reverse().slice(0, 5);
+            $('recentSales').innerHTML = recent.length ? recent.map(s =>
+                `<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px"><div><b>${esc(s.no)}</b><div class="muted">${s.date} · ${esc(product(s.productId)?.name || '-')}</div></div><b>${rupiah(s.total)}</b></div>`
+            ).join('') : '<div class="empty">Belum ada transaksi.</div>';
+
+            const currentMonth = today().slice(0, 7);
+            const monthSales = salesForMonth(currentMonth);
+            const performance = {};
+            monthSales.forEach(s => {
+                const p = product(s.productId);
+                const key = s.productId || s.no;
+                if (!performance[key]) performance[key] = {
+                    sku: p?.sku || '-',
+                    name: p?.name || 'Barang tidak ditemukan',
+                    transactions: new Set(),
+                    qty: 0,
+                    revenue: 0
+                };
+                performance[key].transactions.add(s.no);
+                performance[key].qty += num(s.qty);
+                performance[key].revenue += num(s.total);
+            });
+            const topProducts = Object.values(performance)
+                .sort((a, b) => b.revenue - a.revenue)
+                .slice(0, 5);
+
+            $('dashTopProductSubtitle').textContent =
+                `5 produk dengan omzet tertinggi · ${new Date(currentMonth + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`;
+            $('dashTopProductPerformance').innerHTML = topProducts.length ? `
+                <table>
+                    <thead><tr>
+                        <th>Produk</th><th class="right">Frekuensi Transaksi</th>
+                        <th class="right">Qty Terjual</th><th class="right">Revenue</th>
+                    </tr></thead>
+                    <tbody>${topProducts.map((p, index) => `
+                        <tr>
+                            <td><div style="display:flex;align-items:center;gap:9px">
+                                <span class="pill">${index + 1}</span>
+                                <div><b>${esc(p.name)}</b><div class="muted" style="font-size:10px">${esc(p.sku)}</div></div>
+                            </div></td>
+                            <td class="right">${p.transactions.size.toLocaleString('id-ID')}</td>
+                            <td class="right">${p.qty.toLocaleString('id-ID')}</td>
+                            <td class="right"><b>${rupiah(p.revenue)}</b></td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>` : '<div class="empty">Belum ada transaksi penjualan pada bulan berjalan.</div>';
+
+            let low = db.products.filter(p => stockOf(p.id) <= num(p.minStock));
+            $('lowStock').innerHTML = low.length ? `<table><thead><tr><th>SKU</th><th>Produk</th><th>Stok</th><th>Stock Minimal</th><th>Status</th></tr></thead><tbody>${low.map(p => `<tr><td>${esc(p.sku)}</td><td>${esc(p.name)}</td><td>${stockOf(p.id)} ${esc(p.unit)}</td><td>${num(p.minStock)} ${esc(p.unit)}</td><td><span class="stock-warning">⚠ Stok Menipis</span></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Tidak ada barang dengan stok rendah.</div>';
+            drawChart();
+        }
         let chart; function drawChart() { let c = $('salesChart'); if (!c || !window.Chart) return; let labels = [], data = []; for (let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(d.getDate() - i); let key = d.toISOString().slice(0, 10); labels.push(key.slice(5)); data.push(db.sales.filter(s => s.date === key).reduce((a, s) => a + s.total, 0)) } if (chart) chart.destroy(); chart = new Chart(c, { type: 'bar', data: { labels, datasets: [{ label: 'Omzet', data, borderRadius: 6, backgroundColor: '#6683f4' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => 'Rp ' + (v / 1000) + 'k' }, grid: { color: '#eff2f6' } }, x: { grid: { display: false } } } } }) }
         function renderAll() { renderProducts(); renderSuppliers(); renderStock(); renderOpnames(); renderSales(); renderLogbook(); renderRecap(); renderDashboard() }
         function downloadTemplate() {
@@ -1447,6 +1592,231 @@
         function exportProducts() { let rows = db.products.map(p => ({ 'Kode SKU': p.sku, Brand: p.brand, 'Nama Produk': p.name, Kategori: p.category, Satuan: p.unit, HPP: p.hpp, 'Harga Jual': p.price, 'Stock Minimal': num(p.minStock), Margin: margin(p), 'Persentase Margin': marginPct(p).toFixed(2) + '%' })); exportRows(rows, 'Master_Barang.xlsx', 'Barang') }
         function exportSales() { exportRows(db.sales.map(s => ({ 'Tanggal': s.date, 'No. Trx': s.no, 'Kode SKU': product(s.productId)?.sku || '', 'Nama Produk': product(s.productId)?.name || '', QTY: s.qty, 'Harga Satuan': s.price, Total: s.total, 'Metode Bayar': s.method })), 'Penjualan.xlsx', 'Penjualan') }
         function exportRecap() { let m = $('monthFilter').value || today().slice(0, 7), rows = salesForMonth(m), cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + s.total, 0), non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + s.total, 0), total = rows.reduce((a, s) => a + s.total, 0), profit = rows.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0); exportRows([{ 'Periode': m, 'Total Transaksi': new Set(rows.map(s => s.no)).size, 'Omzet Tunai': cash, 'Omzet Non-Tunai': non, 'Total Omzet': total, 'Est. Profit': profit }], 'Rekap_Bulanan.xlsx', 'Rekap') }
+
+        function exportRecapPDF() {
+            const period = $('monthFilter').value || today().slice(0, 7);
+            const rows = salesForMonth(period).slice().sort((a, b) =>
+                a.date.localeCompare(b.date) || String(a.no).localeCompare(String(b.no))
+            );
+            const fmt = value => rupiah(value);
+            const fmtDate = value => value ? new Date(value + 'T00:00:00').toLocaleDateString('id-ID', {
+                day: '2-digit', month: 'long', year: 'numeric'
+            }) : '-';
+            const monthLabel = new Date(period + '-01T00:00:00').toLocaleDateString('id-ID', {
+                month: 'long', year: 'numeric'
+            });
+            const total = rows.reduce((sum, s) => sum + num(s.total), 0);
+            const cash = rows.filter(s => s.method === 'Tunai').reduce((sum, s) => sum + num(s.total), 0);
+            const nonCash = total - cash;
+            const qtyTotal = rows.reduce((sum, s) => sum + num(s.qty), 0);
+            const hppTotal = rows.reduce((sum, s) => sum + num(product(s.productId)?.hpp) * num(s.qty), 0);
+            const grossProfit = total - hppTotal;
+            const marginPercent = total ? grossProfit / total * 100 : 0;
+            const transactionCount = new Set(rows.map(s => s.no)).size;
+            const uniqueProducts = new Set(rows.map(s => s.productId)).size;
+
+            const paymentMap = {};
+            rows.forEach(s => {
+                const key = s.method || 'Tidak dicantumkan';
+                paymentMap[key] = (paymentMap[key] || 0) + num(s.total);
+            });
+            const paymentRows = Object.entries(paymentMap).sort((a, b) => b[1] - a[1]);
+
+            const productMap = {};
+            rows.forEach(s => {
+                const p = product(s.productId);
+                const key = s.productId || s.no;
+                if (!productMap[key]) productMap[key] = {
+                    sku: p?.sku || '-', name: p?.name || 'Barang tidak ditemukan',
+                    qty: 0, sales: 0, hpp: 0, profit: 0, transactions: new Set()
+                };
+                const item = productMap[key];
+                item.qty += num(s.qty);
+                item.sales += num(s.total);
+                item.hpp += num(p?.hpp) * num(s.qty);
+                item.profit += num(s.total) - num(p?.hpp) * num(s.qty);
+                item.transactions.add(s.no);
+            });
+            const productRows = Object.values(productMap).sort((a, b) => b.sales - a.sales);
+            const topPerformanceRows = productRows.slice(0, 5);
+
+            const dailyMap = {};
+            rows.forEach(s => {
+                if (!dailyMap[s.date]) dailyMap[s.date] = { transactions: new Set(), qty: 0, total: 0 };
+                dailyMap[s.date].transactions.add(s.no);
+                dailyMap[s.date].qty += num(s.qty);
+                dailyMap[s.date].total += num(s.total);
+            });
+            const dailyRows = Object.entries(dailyMap).sort((a, b) => a[0].localeCompare(b[0]));
+
+            const escPdf = value => String(value ?? '').replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+            const paymentHtml = paymentRows.length ? paymentRows.map(([method, amount]) =>
+                `<tr><td>${escPdf(method)}</td><td class="num">${fmt(amount)}</td><td class="num">${total ? (amount / total * 100).toFixed(2) : '0.00'}%</td></tr>`
+            ).join('') : '<tr><td colspan="3" class="empty">Tidak ada transaksi pada periode ini.</td></tr>';
+            const productHtml = productRows.length ? productRows.map(p =>
+                `<tr><td>${escPdf(p.sku)}</td><td>${escPdf(p.name)}</td><td class="num">${p.qty}</td><td class="num">${fmt(p.sales)}</td><td class="num">${fmt(p.hpp)}</td><td class="num">${fmt(p.profit)}</td></tr>`
+            ).join('') : '<tr><td colspan="6" class="empty">Tidak ada data produk.</td></tr>';
+            const dailyHtml = dailyRows.length ? dailyRows.map(([date, d]) =>
+                `<tr><td>${fmtDate(date)}</td><td class="num">${d.transactions.size}</td><td class="num">${d.qty}</td><td class="num">${fmt(d.total)}</td></tr>`
+            ).join('') : '<tr><td colspan="4" class="empty">Tidak ada transaksi pada periode ini.</td></tr>';
+
+            const topPerformanceHtml = topPerformanceRows.length ? topPerformanceRows.map((p, index) =>
+                `<tr><td class="num">${index + 1}</td><td>${escPdf(p.sku)}</td><td>${escPdf(p.name)}</td><td class="num">${p.transactions.size}</td><td class="num">${p.qty}</td><td class="num">${fmt(p.sales)}</td></tr>`
+            ).join('') : '<tr><td colspan="6" class="empty">Tidak ada data produk pada periode ini.</td></tr>';
+            const detailHtml = rows.length ? rows.map(s => {
+                const p = product(s.productId);
+                return `<tr><td>${fmtDate(s.date)}</td><td>${escPdf(s.no)}</td><td>${escPdf(p?.sku || '-')}</td><td>${escPdf(p?.name || 'Barang tidak ditemukan')}</td><td class="num">${num(s.qty)}</td><td class="num">${fmt(s.price)}</td><td>${escPdf(s.method || '-')}</td><td class="num">${fmt(s.total)}</td></tr>`;
+            }).join('') : '<tr><td colspan="8" class="empty">Belum ada transaksi penjualan pada bulan ini.</td></tr>';
+
+            const reportWindow = window.open('', '_blank');
+            if (!reportWindow) {
+                showToast('Izinkan pop-up untuk situs ini, lalu klik Save to PDF kembali.', 'info', 'Jendela PDF diblokir');
+                return;
+            }
+            const generatedAt = new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
+            reportWindow.document.open();
+            reportWindow.document.write(`<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><title>Rekap Bulanan KDKMP - ${escPdf(period)}</title>
+<style>
+    @page { size: A4 landscape; margin: 18mm 20mm; }
+    * { box-sizing: border-box; }
+    html { background: #eef2f8; }
+    body {
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 22px 26px 28px;
+        font-family: Inter, "Segoe UI", Arial, sans-serif;
+        color: #17243a;
+        font-size: 9px;
+        background: #fff;
+        line-height: 1.45;
+    }
+    .header {
+        display:flex; justify-content:space-between; align-items:center; gap:24px;
+        padding:25px 28px; margin:0 0 20px; color:#fff; border-radius:14px;
+        background:linear-gradient(120deg,#142541 0%,#294a82 58%,#4263eb 100%);
+        box-shadow:0 8px 22px #20376520;
+    }
+    .brand { font-size:25px; font-weight:850; letter-spacing:1.4px; color:#fff; }
+    .subtitle { color:#dbe5ff; font-size:9px; margin-top:6px; letter-spacing:.7px; }
+    .period {
+        text-align:right; font-size:9px; line-height:1.8; color:#e5ecff;
+        padding:10px 14px; border:1px solid #ffffff30; border-radius:10px;
+        background:#ffffff10; min-width:185px;
+    }
+    .period b { color:#cbd8ff; font-size:7px; letter-spacing:1.2px; }
+    .section-kicker { color:#71809a; font-size:8px; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; margin:20px 0 8px; }
+    h2 {
+        font-size:11px; color:#203765; margin:19px 0 9px; padding:0 0 8px;
+        border-bottom:1px solid #e4eaf3; letter-spacing:.15px;
+        break-after:avoid;
+    }
+    .cards { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; margin:12px 0 12px; }
+    .card {
+        border:1px solid #e2e8f2; border-radius:10px; padding:12px 13px;
+        background:linear-gradient(180deg,#fff 0%,#f8faff 100%);
+        page-break-inside:avoid; box-shadow:0 3px 10px #20376508;
+    }
+    .card .label { color:#75829a; font-size:7px; font-weight:800; text-transform:uppercase; letter-spacing:.65px; }
+    .card .value { font-size:13px; font-weight:800; margin-top:7px; color:#203765; }
+    .card.profit { background:linear-gradient(180deg,#f5fcf9,#edf9f4); border-color:#cceee0; }
+    .card.profit .value { color:#13825f; }
+    .cards.secondary { grid-template-columns:repeat(3,minmax(0,1fr)); max-width:720px; margin-top:9px; }
+    table { width:100%; border-collapse:separate; border-spacing:0; margin:0 0 14px; page-break-inside:auto; }
+    thead { display:table-header-group; }
+    tr { page-break-inside:avoid; break-inside:avoid; }
+    th {
+        background:#edf2fb; color:#425575; text-align:left; font-size:7.5px;
+        font-weight:800; padding:9px 8px; border-top:1px solid #dce5f2;
+        border-bottom:1px solid #dce5f2;
+    }
+    th:first-child { border-left:1px solid #dce5f2; border-top-left-radius:6px; }
+    th:last-child { border-right:1px solid #dce5f2; border-top-right-radius:6px; }
+    td { padding:8px; border-bottom:1px solid #e9eef5; vertical-align:top; color:#34435c; }
+    td:first-child { border-left:1px solid #edf1f6; }
+    td:last-child { border-right:1px solid #edf1f6; }
+    tbody tr:nth-child(even) { background:#f8faff; }
+    tbody tr:last-child td:first-child { border-bottom-left-radius:6px; }
+    tbody tr:last-child td:last-child { border-bottom-right-radius:6px; }
+    .num { text-align:right; white-space:nowrap; }
+    .empty { text-align:center; color:#78859a; padding:15px; }
+    .note {
+        background:#f4f7fc; border:1px solid #e2e9f3; padding:12px 14px;
+        border-radius:9px; line-height:1.7; color:#596981; margin-top:12px;
+    }
+    .footer {
+        border-top:1px solid #e1e7f0; margin-top:22px; padding-top:9px;
+        display:flex; justify-content:space-between; color:#7b879b; font-size:7.5px;
+    }
+    .signature { display:flex; justify-content:flex-end; margin-top:30px; gap:85px; text-align:center; color:#596981; }
+    .signature div { min-width:155px; }
+    .signature .line { border-top:1px solid #aab5c6; margin-top:42px; padding-top:7px; }
+    .report-tag {
+        display:inline-block; padding:6px 11px; border:1px solid #ffffff55;
+        border-radius:20px; color:#fff; font-size:7px; font-weight:800;
+        letter-spacing:.6px; margin-top:11px;
+    }
+    @media screen {
+        body { margin:24px auto; border-radius:14px; box-shadow:0 16px 48px #17243a18; }
+    }
+    @media print {
+        html { background:#fff; }
+        body { max-width:none; margin:0; padding:0; box-shadow:none; border-radius:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        .header { box-shadow:none; }
+    }
+</style></head><body>
+<main class="report-content">
+<div class="header">
+  <div><div class="brand">KDKMP</div><div class="subtitle">INVENTORY &amp; SALES SYSTEM · LAPORAN MANAJEMEN</div><div class="report-tag">REKAP PENJUALAN BULANAN</div></div>
+  <div class="period"><b>PERIODE LAPORAN</b><br><strong style="font-size:15px;color:#fff">${escPdf(monthLabel)}</strong><br>Dicetak: ${escPdf(generatedAt)}</div>
+</div>
+<div class="section-kicker">Executive summary · Ringkasan kinerja</div>
+<div class="cards">
+  <div class="card"><div class="label">Total Transaksi</div><div class="value">${transactionCount}</div></div>
+  <div class="card"><div class="label">Total Item Terjual</div><div class="value">${qtyTotal.toLocaleString('id-ID')}</div></div>
+  <div class="card"><div class="label">Omzet Tunai</div><div class="value">${fmt(cash)}</div></div>
+  <div class="card"><div class="label">Omzet Non-Tunai</div><div class="value">${fmt(nonCash)}</div></div>
+  <div class="card"><div class="label">Total Omzet</div><div class="value">${fmt(total)}</div></div>
+</div>
+<div class="cards secondary">
+  <div class="card"><div class="label">Estimasi HPP</div><div class="value">${fmt(hppTotal)}</div></div>
+  <div class="card profit"><div class="label">Estimasi Laba Kotor</div><div class="value">${fmt(grossProfit)}</div></div>
+  <div class="card"><div class="label">Margin Laba Kotor</div><div class="value">${marginPercent.toFixed(2)}%</div></div>
+</div>
+
+<h2>1. Ringkasan Metode Pembayaran</h2>
+<table><thead><tr><th>Metode Pembayaran</th><th class="num">Total Pembayaran</th><th class="num">Persentase Omzet</th></tr></thead><tbody>${paymentHtml}</tbody></table>
+
+<h2>2. Top Product Performance</h2>
+<table><thead><tr><th class="num">Peringkat</th><th>Kode SKU</th><th>Nama Produk</th><th class="num">Frekuensi Transaksi</th><th class="num">Qty Terjual</th><th class="num">Revenue</th></tr></thead><tbody>${topPerformanceHtml}</tbody></table>
+<div class="note" style="margin-top:0">Frekuensi Transaksi adalah jumlah nomor transaksi berbeda yang memuat produk tersebut. Aplikasi belum merekam aktivitas Add to Cart secara terpisah, sehingga metrik ini digunakan sebagai indikator frekuensi produk muncul dalam transaksi.</div>
+
+<h2>3. Rekap Penjualan per Barang</h2>
+<table><thead><tr><th>Kode SKU</th><th>Nama Barang</th><th class="num">Qty Terjual</th><th class="num">Omzet</th><th class="num">Estimasi HPP</th><th class="num">Estimasi Laba Kotor</th></tr></thead><tbody>${productHtml}</tbody></table>
+
+<h2>4. Rekap Penjualan Harian</h2>
+<table><thead><tr><th>Tanggal</th><th class="num">Jumlah Transaksi</th><th class="num">Qty Terjual</th><th class="num">Omzet Harian</th></tr></thead><tbody>${dailyHtml}</tbody></table>
+
+<h2>5. Rincian Transaksi Penjualan</h2>
+<table><thead><tr><th>Tanggal</th><th>No. Transaksi</th><th>Kode SKU</th><th>Nama Barang</th><th class="num">Qty</th><th class="num">Harga Satuan</th><th>Metode Pembayaran</th><th class="num">Total</th></tr></thead><tbody>${detailHtml}</tbody></table>
+
+<div class="note"><b>Catatan perhitungan:</b><br>
+• Omzet adalah akumulasi nilai transaksi penjualan pada periode yang dipilih.<br>
+• Tunai dihitung dari transaksi dengan metode pembayaran “Tunai”; non-tunai mencakup metode pembayaran selain Tunai yang tercatat pada transaksi.<br>
+• Estimasi HPP dan laba kotor menggunakan HPP yang saat ini tersimpan pada Master Data Barang (bukan histori HPP pada tanggal transaksi).<br>
+• Estimasi laba kotor = total omzet − estimasi HPP. Angka ini belum memperhitungkan biaya operasional, pajak, diskon, atau beban lainnya.<br>
+• Laporan disusun berdasarkan transaksi penjualan yang tersimpan pada aplikasi untuk periode ${escPdf(monthLabel)}.
+</div>
+<div class="signature"><div>Disusun oleh,<div class="line">Administrator KDKMP</div></div><div>Mengetahui,<div class="line">________________________</div></div></div>
+<div class="footer"><span>KDKMP · Inventory &amp; Sales System</span><span>Dokumen dibuat otomatis · ${escPdf(generatedAt)}</span></div>
+</main>
+</body></html>`);
+            reportWindow.document.close();
+        }
+
         function exportRows(rows, file, sheet) { if (!rows.length) return alert('Tidak ada data untuk diekspor.'); let ws = XLSX.utils.json_to_sheet(rows), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheet); XLSX.writeFile(wb, file) }
         function exportCSV() { let rows = db.products.map(p => [p.sku, p.brand, p.name, p.category, p.unit, p.hpp, p.price, num(p.minStock), margin(p), marginPct(p)]), csv = [['Kode SKU', 'Brand', 'Nama Produk', 'Kategori', 'Satuan', 'HPP', 'Harga Jual', 'Stock Minimal', 'Margin', 'Persentase Margin'], ...rows].map(r => r.join(';')).join('\n'); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })); a.download = 'Master_Barang.csv'; a.click() }
         $('today').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); $('monthFilter').value = today().slice(0, 7); renderAll();
