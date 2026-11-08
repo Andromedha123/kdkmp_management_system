@@ -1003,6 +1003,182 @@
                 padding: 25px
             }
         }
+
+
+        /* Micro-interactions: animasi ringan untuk aksi pengguna */
+        @keyframes pageEnter {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes rowEnter {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes modalEnter {
+            from { opacity: 0; transform: translateY(16px) scale(.975); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastPop {
+            0% { transform: translateY(-8px) scale(.97); }
+            65% { transform: translateY(2px) scale(1.01); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .page.active.page-enter { animation: pageEnter .38s cubic-bezier(.2,.7,.25,1) both; }
+        .modal-back.show { animation: fadeOverlay .2s ease both; }
+        .modal-back.show .modal { animation: modalEnter .28s cubic-bezier(.2,.75,.25,1) both; }
+        @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
+        .app-toast.show { animation: toastPop .32s cubic-bezier(.2,.75,.25,1) both; }
+        .app-toast.show .toast-icon { animation: softPop .35s .05s both; }
+        .btn, .action, .nav-btn, .shortcut-card, .logout-btn, .login-submit {
+            transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, filter .18s ease;
+        }
+        .btn:hover, .action:hover, .logout-btn:hover, .login-submit:hover {
+            filter: brightness(.98); transform: translateY(-1px); box-shadow: 0 5px 13px #17243a12;
+        }
+        .btn:active, .action:active, .nav-btn:active, .shortcut-card:active, .logout-btn:active, .login-submit:active {
+            transform: scale(.97);
+        }
+        .nav-btn:hover { transform: translateX(3px); }
+        .table-wrap tbody tr { animation: rowEnter .24s ease both; }
+        .table-wrap tbody tr:nth-child(2) { animation-delay: .025s; }
+        .table-wrap tbody tr:nth-child(3) { animation-delay: .05s; }
+        .table-wrap tbody tr:nth-child(4) { animation-delay: .075s; }
+        .table-wrap tbody tr:nth-child(5) { animation-delay: .1s; }
+        button { -webkit-tap-highlight-color: transparent; }
+        button.ripple-host { position: relative; overflow: hidden; isolation: isolate; }
+        .action-ripple {
+            position: absolute; border-radius: 50%; pointer-events: none;
+            width: 12px; height: 12px; background: currentColor; opacity: .18;
+            transform: translate(-50%,-50%) scale(0); animation: rippleOut .55s ease-out forwards;
+            z-index: 0;
+        }
+        @keyframes rippleOut { to { transform: translate(-50%,-50%) scale(18); opacity: 0; } }
+        @media (prefers-reduced-motion: reduce) {
+            .page.active.page-enter, .modal-back.show, .modal-back.show .modal,
+            .app-toast.show, .app-toast.show .toast-icon, .table-wrap tbody tr,
+            .action-ripple { animation: none !important; }
+            .btn, .action, .nav-btn, .shortcut-card, .logout-btn, .login-submit { transition: none !important; }
+        }
+
+    
+        /* Responsive refinement: tablet, mobile, and touch-friendly controls */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        body { overflow-x: hidden; }
+        img, canvas, svg { max-width: 100%; }
+        .table-wrap { max-width: 100%; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+        .table-wrap table { min-width: 620px; }
+        button, .btn, .action, .nav-btn { touch-action: manipulation; }
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 3px solid #4263eb35; outline-offset: 2px;
+        }
+
+        @media (min-width: 701px) and (max-width: 1100px) {
+            .sidebar { width: 205px; padding: 20px 12px; }
+            .main { margin-left: 205px; width: calc(100% - 205px); padding: 22px 20px 40px; }
+            .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .grid2 { grid-template-columns: minmax(0, 1fr); }
+            .shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .topbar { align-items: flex-start; }
+            .top-right { flex-wrap: wrap; justify-content: flex-end; }
+            .panel { padding: 17px; }
+        }
+
+        @media (max-width: 700px) {
+            .app { display: block; min-height: 100vh; }
+            .sidebar {
+                position: sticky; top: 0; left: 0; right: 0; bottom: auto;
+                z-index: 20; width: 100%; height: auto; min-height: 0;
+                padding: 8px 9px; display: flex; flex-direction: row;
+                align-items: center; gap: 5px; overflow-x: auto; overflow-y: hidden;
+                white-space: nowrap; scrollbar-width: none;
+                box-shadow: 0 5px 18px #17243a18;
+            }
+            .sidebar::-webkit-scrollbar { display: none; }
+            .sidebar .brand, .sidebar .nav-label, .sidebar .side-foot { display: none !important; }
+            .sidebar .nav-btn, .sidebar .nav-btn .txt {
+                display: inline-flex !important;
+            }
+            .sidebar .nav-btn {
+                flex: 0 0 auto; width: auto; min-height: 42px;
+                justify-content: flex-start; padding: 9px 12px; margin: 0;
+                border-radius: 10px; font-size: 11px; gap: 7px;
+            }
+            .sidebar .nav-btn span { width: auto; font-size: 15px; }
+            .sidebar .nav-btn .txt { font-style: normal; }
+            .main {
+                margin: 0 !important; width: 100% !important;
+                padding: 16px 13px 32px !important;
+            }
+            .topbar { gap: 12px; align-items: flex-start; margin-bottom: 18px; }
+            .page-title { font-size: 20px; line-height: 1.25; }
+            .eyebrow { font-size: 10px; }
+            .top-right { gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+            .user-chip { padding: 7px 9px; font-size: 10px; }
+            .user-dot { width: 24px; height: 24px; }
+            .logout-btn { min-height: 38px; padding: 8px 10px; }
+            .date-chip { display: none !important; }
+            .welcome-banner { padding: 19px; gap: 12px; }
+            .welcome-title { font-size: 21px; }
+            .welcome-description { font-size: 11px; }
+            .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+            .stat { min-width: 0; padding: 13px; }
+            .stat-value { font-size: 17px; overflow-wrap: anywhere; }
+            .stat-note { line-height: 1.45; }
+            .dashboard-insights { grid-template-columns: 1fr; gap: 9px; }
+            .insight-card { padding: 13px 15px; }
+            .insight-value { font-size: 21px; }
+            .shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+            .shortcut-card { min-height: 70px; padding: 10px 8px; }
+            .shortcut-card small { font-size: 9px; }
+            .grid2 { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+            .panel { padding: 14px; margin-bottom: 12px; border-radius: 12px; }
+            .panel-head { align-items: flex-start; flex-wrap: wrap; gap: 9px; }
+            .panel h3 { font-size: 14px; }
+            .sub { line-height: 1.5; }
+            .toolbar { align-items: stretch; }
+            .toolbar .search { min-width: 100%; max-width: none; }
+            .toolbar > input[type="date"], .toolbar > select { flex: 1 1 130px; min-width: 0; max-width: none !important; }
+            .btnline { gap: 7px; }
+            .btn, .action { min-height: 38px; padding: 9px 11px; }
+            .formgrid { grid-template-columns: minmax(0, 1fr); }
+            .formgrid .full { grid-column: auto; }
+            .modal-back { align-items: flex-end; padding: 0; }
+            .modal {
+                width: 100%; max-width: 100%; max-height: 88vh;
+                border-radius: 18px 18px 0 0; padding: 19px 15px;
+                padding-bottom: max(19px, env(safe-area-inset-bottom));
+            }
+            .modal-actions { flex-wrap: wrap; }
+            .modal-actions .btn { flex: 1 1 auto; min-height: 42px; }
+            .app-toast { top: 10px; right: 10px; width: calc(100vw - 20px); }
+            .chartbox { height: 220px; }
+            .table-wrap table { min-width: 650px; }
+        }
+
+        @media (max-width: 420px) {
+            .main { padding-left: 10px !important; padding-right: 10px !important; }
+            .topbar { flex-direction: column; }
+            .top-right { width: 100%; justify-content: space-between; }
+            .cards { gap: 7px; }
+            .stat { padding: 11px; }
+            .stat-top { font-size: 10px; }
+            .stat-value { font-size: 15px; }
+            .stat-icon { width: 28px; height: 28px; }
+            .shortcut-heading { align-items: flex-start; }
+            .shortcut-card { align-items: flex-start; }
+            .shortcut-symbol { width: 29px; height: 29px; flex-basis: 29px; }
+            .shortcut-arrow { display: none; }
+            .welcome-date { font-size: 10px; }
+            .panel { padding: 12px; }
+            .panel-head .btnline { width: 100%; }
+            .panel-head .btnline .btn { flex: 1 1 auto; }
+            .login-card { padding: 24px 20px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; }
+        }
+
     </style>
 </head>
 
@@ -1439,7 +1615,18 @@
         function margin(p) { return num(p.price) - num(p.hpp) }
         function marginPct(p) { return num(p.price) ? margin(p) / num(p.price) * 100 : 0 }
         function addMovement(productId, date, inn, out, desc, ref = '') { db.movements.push({ id: uid(), productId, date, in: num(inn), out: num(out), desc, ref }) }
-        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id)); document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === id)); $('pageTitle').textContent = ({ dashboard: 'Dashboard', barang: 'Master Data Barang', supplier: 'Supplier & Distributor', stockcard: 'Stock Card', opname: 'Stock Opname', sales: 'Penjualan Harian', logbook: 'Logbook & Evaluasi Harian', baopname: 'Berita Acara Stock Opname', bakerusakan: 'Berita Acara Kerusakan / Kadaluwarsa', rekap: 'Rekap Bulanan' })[id]; if (id === 'dashboard') renderDashboard() }
+        function showPage(id) {
+            const nextPage = $(id);
+            document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === id));
+            $('pageTitle').textContent = ({ dashboard: 'Dashboard', barang: 'Master Data Barang', supplier: 'Supplier & Distributor', stockcard: 'Stock Card', opname: 'Stock Opname', sales: 'Penjualan Harian', logbook: 'Logbook & Evaluasi Harian', baopname: 'Berita Acara Stock Opname', bakerusakan: 'Berita Acara Kerusakan / Kadaluwarsa', rekap: 'Rekap Bulanan' })[id];
+            if (nextPage) {
+                nextPage.classList.remove('page-enter');
+                void nextPage.offsetWidth;
+                nextPage.classList.add('page-enter');
+            }
+            if (id === 'dashboard') renderDashboard();
+        }
         document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => showPage(b.dataset.page));
         function modal(title, body, saveLabel, fn) { $('modalTitle').textContent = title; $('modalBody').innerHTML = body; $('modalActions').innerHTML = '<button class="btn" onclick="closeModal()">Batal</button><button class="btn primary" id="modalSave">' + saveLabel + '</button>'; $('modal').classList.add('show'); $('modalSave').onclick = fn }
         function showDeleteConfirmation(message, detail, onConfirm) {
@@ -2458,6 +2645,20 @@
 
         function exportRows(rows, file, sheet) { if (!rows.length) return showToast('Tidak ada data untuk diekspor.', 'info', 'Data kosong'); let ws = XLSX.utils.json_to_sheet(rows), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheet); XLSX.writeFile(wb, file) }
         function exportCSV() { let rows = db.products.map(p => [p.sku, p.brand, p.name, p.category, p.unit, p.hpp, p.price, num(p.minStock), margin(p), marginPct(p)]), csv = [['Kode SKU', 'Brand', 'Nama Produk', 'Kategori', 'Satuan', 'HPP', 'Harga Jual', 'Stock Minimal', 'Margin', 'Persentase Margin'], ...rows].map(r => r.join(';')).join('\n'); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })); a.download = 'Master_Barang.csv'; a.click() }
+        // Efek ripple pada tombol: memberi umpan balik visual saat tombol ditekan.
+        document.addEventListener('pointerdown', function (event) {
+            const button = event.target.closest('button');
+            if (!button || button.disabled || button.closest('.login-screen') && button.type !== 'submit') return;
+            button.classList.add('ripple-host');
+            const rect = button.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'action-ripple';
+            ripple.style.left = (event.clientX - rect.left) + 'px';
+            ripple.style.top = (event.clientY - rect.top) + 'px';
+            button.appendChild(ripple);
+            window.setTimeout(() => ripple.remove(), 600);
+        });
+
         $('today').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); setRecapPreset('month'); renderAll();
     </script>
 </body>
