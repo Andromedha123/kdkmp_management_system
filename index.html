@@ -942,6 +942,9 @@
                     class="txt">Rekap Bulanan</i></button>
             <div class="nav-label">OPERASIONAL & SDM</div><button class="nav-btn" data-page="logbook"><span>✎</span><i
                     class="txt">Logbook & Evaluasi Harian</i></button>
+            <div class="nav-label">BERITA ACARA</div>
+            <button class="nav-btn" data-page="baopname"><span>▧</span><i class="txt">BA Stock Opname</i></button>
+            <button class="nav-btn" data-page="bakerusakan"><span>⚠</span><i class="txt">BA Kerusakan / Kadaluwarsa</i></button>
             <div class="side-foot">KDKMP · Prototype v1.1<br>Data tersimpan di browser ini</div>
         </aside>
         <main class="main">
@@ -1122,6 +1125,40 @@
                     <div class="table-wrap" id="logTable"></div>
                 </div>
             </section>
+            <section class="page" id="baopname">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h3>Berita Acara Stock Opname</h3><div class="sub">Dokumentasi selisih antara stok sistem dan stok fisik, termasuk alasan dan tindak lanjut.</div></div>
+                        <div class="btnline">
+                            <button class="btn" onclick="exportBAOpname()">Export Excel</button>
+                            <button class="btn primary" onclick="openBAOpname()">＋ Buat Berita Acara</button>
+                        </div>
+                    </div>
+                    <div class="toolbar">
+                        <div class="search"><input id="baOpnameSearch" placeholder="Cari SKU atau nama produk..." oninput="renderBAOpname()"></div>
+                        <input type="date" id="baOpnameFrom" style="max-width:160px" onchange="renderBAOpname()">
+                        <input type="date" id="baOpnameTo" style="max-width:160px" onchange="renderBAOpname()">
+                    </div>
+                    <div class="table-wrap" id="baOpnameTable"></div>
+                </div>
+            </section>
+            <section class="page" id="bakerusakan">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h3>Berita Acara Kerusakan / Kadaluwarsa Barang</h3><div class="sub">Pencatatan barang rusak, kedaluwarsa, tidak layak jual, beserta penyebab dan penyelesaiannya.</div></div>
+                        <div class="btnline">
+                            <button class="btn" onclick="exportBADamage()">Export Excel</button>
+                            <button class="btn primary" onclick="openBADamage()">＋ Buat Berita Acara</button>
+                        </div>
+                    </div>
+                    <div class="toolbar">
+                        <div class="search"><input id="baDamageSearch" placeholder="Cari nama barang, kondisi, atau penyebab..." oninput="renderBADamage()"></div>
+                        <input type="date" id="baDamageFrom" style="max-width:160px" onchange="renderBADamage()">
+                        <input type="date" id="baDamageTo" style="max-width:160px" onchange="renderBADamage()">
+                    </div>
+                    <div class="table-wrap" id="baDamageTable"></div>
+                </div>
+            </section>
             <section class="page" id="rekap">
                 <div class="panel">
                     <div class="panel-head">
@@ -1245,7 +1282,7 @@
         });
         if (isLoggedIn()) enterApp(); else showLogin();
 
-        let db = JSON.parse(localStorage.getItem('kdkmp_db') || 'null') || { products: [], movements: [], opnames: [], sales: [] }; db.logbooks ||= []; db.evaluations ||= []; db.devplans ||= []; db.suppliers ||= [];
+        let db = JSON.parse(localStorage.getItem('kdkmp_db') || 'null') || { products: [], movements: [], opnames: [], sales: [] }; db.logbooks ||= []; db.evaluations ||= []; db.devplans ||= []; db.suppliers ||= []; db.baOpnames ||= []; db.baDamages ||= [];
         function save() { localStorage.setItem('kdkmp_db', JSON.stringify(db)); renderAll() }
         function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
         function stockOf(id) { return db.movements.filter(m => m.productId === id).reduce((a, m) => a + num(m.in) - num(m.out), 0) }
@@ -1253,7 +1290,7 @@
         function margin(p) { return num(p.price) - num(p.hpp) }
         function marginPct(p) { return num(p.price) ? margin(p) / num(p.price) * 100 : 0 }
         function addMovement(productId, date, inn, out, desc, ref = '') { db.movements.push({ id: uid(), productId, date, in: num(inn), out: num(out), desc, ref }) }
-        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id)); document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === id)); $('pageTitle').textContent = ({ dashboard: 'Dashboard', barang: 'Master Data Barang', supplier: 'Supplier & Distributor', stockcard: 'Stock Card', opname: 'Stock Opname', sales: 'Penjualan Harian', logbook: 'Logbook & Evaluasi Harian', rekap: 'Rekap Bulanan' })[id]; if (id === 'dashboard') renderDashboard() }
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id)); document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === id)); $('pageTitle').textContent = ({ dashboard: 'Dashboard', barang: 'Master Data Barang', supplier: 'Supplier & Distributor', stockcard: 'Stock Card', opname: 'Stock Opname', sales: 'Penjualan Harian', logbook: 'Logbook & Evaluasi Harian', baopname: 'Berita Acara Stock Opname', bakerusakan: 'Berita Acara Kerusakan / Kadaluwarsa', rekap: 'Rekap Bulanan' })[id]; if (id === 'dashboard') renderDashboard() }
         document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => showPage(b.dataset.page));
         function modal(title, body, saveLabel, fn) { $('modalTitle').textContent = title; $('modalBody').innerHTML = body; $('modalActions').innerHTML = '<button class="btn" onclick="closeModal()">Batal</button><button class="btn primary" id="modalSave">' + saveLabel + '</button>'; $('modal').classList.add('show'); $('modalSave').onclick = fn }
         function showDeleteConfirmation(message, detail, onConfirm) {
@@ -1842,7 +1879,94 @@
             drawChart();
         }
         let chart; function drawChart() { let c = $('salesChart'); if (!c || !window.Chart) return; let labels = [], data = []; for (let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(d.getDate() - i); let key = d.toISOString().slice(0, 10); labels.push(key.slice(5)); data.push(db.sales.filter(s => s.date === key).reduce((a, s) => a + s.total, 0)) } if (chart) chart.destroy(); chart = new Chart(c, { type: 'bar', data: { labels, datasets: [{ label: 'Omzet', data, borderRadius: 6, backgroundColor: '#6683f4' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => 'Rp ' + (v / 1000) + 'k' }, grid: { color: '#eff2f6' } }, x: { grid: { display: false } } } } }) }
-        function renderAll() { renderProducts(); renderSuppliers(); renderStock(); renderOpnames(); renderSales(); renderLogbook(); renderRecap(); renderDashboard() }
+        // Berita Acara Stock Opname: dokumentasi saja, tidak mengubah saldo persediaan.
+        function openBAOpname(id = '') {
+            if (!db.products.length) return showToast('Tambahkan master barang terlebih dahulu.', 'info', 'Master barang kosong');
+            const old = id ? db.baOpnames.find(x => x.id === id) : null;
+            const productOptions = db.products.map(p => `<option value="${esc(p.id)}" ${old?.productId === p.id ? 'selected' : ''}>${esc(p.sku)} — ${esc(p.name)}</option>`).join('');
+            modal(id ? 'Edit Berita Acara Stock Opname' : 'Berita Acara Stock Opname', `
+                <div class="formgrid">
+                    ${field('Tanggal Pemeriksaan', 'baoDate', old?.date || today(), 'date')}
+                    <div class="formfield"><label>Kode SKU / Nama Produk</label><select id="baoProduct" onchange="updateBAOpnameSystemStock()">${productOptions}</select></div>
+                    ${field('Stock Sistem', 'baoSystem', old?.systemStock ?? stockOf(old?.productId || db.products[0].id), 'number', 'min="0" readonly')}
+                    ${field('Stock Fisik', 'baoPhysical', old?.physicalStock ?? '', 'number', 'min="0" step="any" oninput="updateBAOpnameDifference()"')}
+                    ${field('Selisih (Fisik - Sistem)', 'baoDiff', old?.difference ?? 0, 'number', 'readonly')}
+                    <div class="formfield"><label>Status Tindakan</label><select id="baoStatus">${['Belum ditindaklanjuti','Dalam proses','Disesuaikan','Selesai','Perlu pemeriksaan lanjutan'].map(v => `<option ${old?.status === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+                    <div class="formfield full"><label>Keterangan / Alasan</label><textarea id="baoReason" rows="3" placeholder="Jelaskan penyebab terjadinya selisih...">${esc(old?.reason || '')}</textarea></div>
+                </div>
+                <div class="notice">Berita acara ini hanya menjadi dokumentasi pemeriksaan. Untuk mengubah saldo stok, gunakan modul Stock Opname.</div>
+            `, 'Simpan Berita Acara', () => {
+                const p = product($('baoProduct').value), physical = num($('baoPhysical').value);
+                if (!$('baoDate').value || !p || $('baoPhysical').value === '' || physical < 0) return showToast('Lengkapi tanggal, produk, dan stock fisik dengan benar.', 'info', 'Data belum lengkap');
+                const system = num($('baoSystem').value);
+                const record = { id: id || uid(), date: $('baoDate').value, productId: p.id, sku: p.sku, productName: p.name, systemStock: system, physicalStock: physical, difference: physical - system, reason: $('baoReason').value.trim(), status: $('baoStatus').value };
+                if (id) { const ix = db.baOpnames.findIndex(x => x.id === id); if (ix >= 0) db.baOpnames[ix] = record; }
+                else db.baOpnames.push(record);
+                save(); closeModal(); showToast('Berita Acara Stock Opname berhasil disimpan.', 'success');
+            });
+            updateBAOpnameSystemStock();
+            if (old) { $('baoSystem').value = old.systemStock; $('baoDiff').value = old.difference; }
+        }
+        function updateBAOpnameSystemStock() {
+            const p = product($('baoProduct')?.value);
+            if (!p) return;
+            $('baoSystem').value = stockOf(p.id);
+            updateBAOpnameDifference();
+        }
+        function updateBAOpnameDifference() {
+            if (!$('baoDiff')) return;
+            $('baoDiff').value = num($('baoPhysical')?.value) - num($('baoSystem')?.value);
+        }
+        function renderBAOpname() {
+            const host = $('baOpnameTable'); if (!host) return;
+            const q = ($('baOpnameSearch')?.value || '').toLowerCase().trim(), from = $('baOpnameFrom')?.value || '', to = $('baOpnameTo')?.value || '';
+            const rows = db.baOpnames.filter(x => (`${x.sku || ''} ${x.productName || ''} ${x.reason || ''} ${x.status || ''}`).toLowerCase().includes(q) && (!from || x.date >= from) && (!to || x.date <= to)).slice().reverse();
+            host.innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>Kode SKU</th><th>Nama Produk</th><th>Stock Sistem</th><th>Stock Fisik</th><th>Selisih</th><th>Keterangan / Alasan</th><th>Status Tindakan</th><th>Aksi</th></tr></thead><tbody>${rows.map(x => `<tr><td>${esc(x.date)}</td><td><b>${esc(x.sku || '-')}</b></td><td>${esc(x.productName || product(x.productId)?.name || '-')}</td><td>${num(x.systemStock)}</td><td>${num(x.physicalStock)}</td><td class="${num(x.difference) < 0 ? 'negative' : num(x.difference) > 0 ? 'positive' : ''}">${num(x.difference) > 0 ? '+' : ''}${num(x.difference)}</td><td style="white-space:normal;min-width:180px">${esc(x.reason || '-')}</td><td><span class="pill ${x.status === 'Selesai' || x.status === 'Disesuaikan' ? 'green' : 'amber'}">${esc(x.status || '-')}</span></td><td><div class="actions"><button class="action" onclick="openBAOpname('${x.id}')">Edit</button><button class="action" onclick="deleteBARecord('baOpnames','${x.id}','Berita Acara Stock Opname')">Hapus</button></div></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Belum ada Berita Acara Stock Opname.</div>';
+        }
+        function exportBAOpname() {
+            const rows = db.baOpnames.map(x => ({Tanggal:x.date, 'Kode SKU':x.sku, 'Nama Produk':x.productName, 'Stock Sistem':x.systemStock, 'Stock Fisik':x.physicalStock, Selisih:x.difference, 'Keterangan / Alasan':x.reason, 'Status Tindakan':x.status}));
+            if (!rows.length) return showToast('Belum ada data untuk diekspor.', 'info');
+            exportRows(rows, 'Berita_Acara_Stock_Opname.xlsx', 'BA Stock Opname');
+        }
+
+        function openBADamage(id = '') {
+            const old = id ? db.baDamages.find(x => x.id === id) : null;
+            modal(id ? 'Edit Berita Acara Kerusakan / Kadaluwarsa' : 'Berita Acara Kerusakan / Kadaluwarsa', `
+                <div class="formgrid">
+                    ${field('Tanggal', 'badDate', old?.date || today(), 'date')}
+                    ${field('Nama Barang', 'badName', old?.itemName || '', 'text', 'placeholder="Masukkan nama barang"')}
+                    ${field('Jumlah', 'badQty', old?.qty ?? 1, 'number', 'min="0.01" step="any"')}
+                    <div class="formfield"><label>Kondisi Kerusakan</label><select id="badCondition">${['Rusak','Kadaluwarsa / Expired','Kemasan rusak','Bocor / Pecah','Tidak layak jual','Lainnya'].map(v => `<option ${old?.condition === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+                    <div class="formfield full"><label>Penyebab</label><textarea id="badCause" rows="3" placeholder="Jelaskan penyebab kerusakan / kadaluwarsa...">${esc(old?.cause || '')}</textarea></div>
+                    <div class="formfield full"><label>Tindakan / Penyelesaian</label><textarea id="badAction" rows="3" placeholder="Jelaskan tindakan atau penyelesaian yang dilakukan...">${esc(old?.action || '')}</textarea></div>
+                </div>
+            `, 'Simpan Berita Acara', () => {
+                const date = $('badDate').value, itemName = $('badName').value.trim(), qty = num($('badQty').value);
+                if (!date || !itemName || qty <= 0) return showToast('Tanggal, nama barang, dan jumlah wajib diisi dengan benar.', 'info', 'Data belum lengkap');
+                const record = { id: id || uid(), date, itemName, qty, condition: $('badCondition').value, cause: $('badCause').value.trim(), action: $('badAction').value.trim() };
+                if (id) { const ix = db.baDamages.findIndex(x => x.id === id); if (ix >= 0) db.baDamages[ix] = record; }
+                else db.baDamages.push(record);
+                save(); closeModal(); showToast('Berita Acara Kerusakan / Kadaluwarsa berhasil disimpan.', 'success');
+            });
+        }
+        function renderBADamage() {
+            const host = $('baDamageTable'); if (!host) return;
+            const q = ($('baDamageSearch')?.value || '').toLowerCase().trim(), from = $('baDamageFrom')?.value || '', to = $('baDamageTo')?.value || '';
+            const rows = db.baDamages.filter(x => (`${x.itemName || ''} ${x.condition || ''} ${x.cause || ''} ${x.action || ''}`).toLowerCase().includes(q) && (!from || x.date >= from) && (!to || x.date <= to)).slice().reverse();
+            host.innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>Nama Barang</th><th>Jumlah</th><th>Kondisi Kerusakan</th><th>Penyebab</th><th>Tindakan / Penyelesaian</th><th>Aksi</th></tr></thead><tbody>${rows.map(x => `<tr><td>${esc(x.date)}</td><td><b>${esc(x.itemName)}</b></td><td>${num(x.qty)}</td><td><span class="pill red">${esc(x.condition)}</span></td><td style="white-space:normal;min-width:180px">${esc(x.cause || '-')}</td><td style="white-space:normal;min-width:180px">${esc(x.action || '-')}</td><td><div class="actions"><button class="action" onclick="openBADamage('${x.id}')">Edit</button><button class="action" onclick="deleteBARecord('baDamages','${x.id}','Berita Acara Kerusakan / Kadaluwarsa')">Hapus</button></div></td></tr>`).join('')}</tbody></table>` : '<div class="empty">Belum ada Berita Acara Kerusakan / Kadaluwarsa.</div>';
+        }
+        function exportBADamage() {
+            const rows = db.baDamages.map(x => ({Tanggal:x.date, 'Nama Barang':x.itemName, Jumlah:x.qty, 'Kondisi Kerusakan':x.condition, Penyebab:x.cause, 'Tindakan / Penyelesaian':x.action}));
+            if (!rows.length) return showToast('Belum ada data untuk diekspor.', 'info');
+            exportRows(rows, 'Berita_Acara_Kerusakan_Kadaluwarsa.xlsx', 'BA Kerusakan');
+        }
+        function deleteBARecord(key, id, label) {
+            showDeleteConfirmation(`Anda akan menghapus ${label}.`, 'Data berita acara yang dihapus tidak dapat dikembalikan.', () => {
+                db[key] = db[key].filter(x => x.id !== id); save(); showToast(`${label} berhasil dihapus.`, 'success');
+            });
+        }
+
+        function renderAll() { renderProducts(); renderSuppliers(); renderStock(); renderOpnames(); renderSales(); renderLogbook(); renderBAOpname(); renderBADamage(); renderRecap(); renderDashboard() }
         function downloadTemplate() {
             if (!window.XLSX) return showToast('Library Excel belum termuat. Periksa koneksi internet.', 'info', 'Excel belum tersedia'); let wb = XLSX.utils.book_new(); let sheets = {
                 'Master Barang': [['Kode SKU', 'Brand', 'Nama Produk', 'Kategori', 'Satuan', 'HPP', 'Harga Jual', 'Stock Minimal'], ['SKU001', 'Bango', 'Bango Kecap Manis 950 GR', 'Makanan', 'Pcs', 36500, 45000, 5], ['SKU002', 'Bango', 'Bango Soy Sauce', 'Makanan', 'Pcs', 28000, 35000, 3]],
