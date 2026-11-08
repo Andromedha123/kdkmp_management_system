@@ -1059,9 +1059,45 @@
                             <h3>Rekap Bulanan</h3>
                             <div class="sub">Ringkasan transaksi, omzet dan estimasi profit berdasarkan HPP</div>
                         </div>
-                        <div class="btnline"><input type="month" id="monthFilter" style="width:155px"
-                                onchange="renderRecap()"><button class="btn" onclick="exportRecap()">Export
-                                Excel</button><button class="btn primary" onclick="exportRecapPDF()">↓ Save to PDF</button></div>
+                        <div class="btnline">
+                            <button class="btn" onclick="setRecapPreset('today')">Hari Ini</button>
+                            <button class="btn" onclick="setRecapPreset('week')">Minggu Ini</button>
+                            <button class="btn" onclick="setRecapPreset('month')">Bulan Ini</button>
+                            <button class="btn" onclick="setRecapPreset('quarter')">Triwulan</button>
+                            <button class="btn" onclick="setRecapPreset('year')">Tahun Ini</button>
+                        </div>
+                    </div>
+                    <div class="panel" style="padding:15px;margin-bottom:18px;box-shadow:none;background:#f8faff;border:1px solid #e4eaf3">
+                        <div class="formgrid" style="align-items:end">
+                            <div class="formfield">
+                                <label for="recapPreset">Jenis Periode Laporan</label>
+                                <select id="recapPreset" onchange="setRecapPreset(this.value)">
+                                    <option value="today">Harian</option>
+                                    <option value="week">Mingguan</option>
+                                    <option value="month" selected>Bulanan</option>
+                                    <option value="quarter">Triwulan</option>
+                                    <option value="semester">Semester</option>
+                                    <option value="year">Tahunan</option>
+                                    <option value="custom">Rentang Tanggal Manual</option>
+                                </select>
+                            </div>
+                            <div class="formfield">
+                                <label for="recapFrom">Tanggal Mulai</label>
+                                <input type="date" id="recapFrom" onchange="onRecapDateChange()">
+                            </div>
+                            <div class="formfield">
+                                <label for="recapTo">Tanggal Akhir</label>
+                                <input type="date" id="recapTo" onchange="onRecapDateChange()">
+                            </div>
+                            <div class="formfield">
+                                <label>&nbsp;</label>
+                                <div class="btnline">
+                                    <button class="btn" onclick="exportRecap()">Export Excel</button>
+                                    <button class="btn primary" onclick="exportRecapPDF()">↓ Generate PDF</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sub" id="recapPeriodInfo" style="margin-top:10px">Pilih jenis periode atau tentukan tanggal mulai dan akhir.</div>
                     </div>
                     <div class="cards" id="recapCards"></div>
                     <div class="table-wrap" id="recapTable"></div>
@@ -1392,15 +1428,76 @@
         function exportLogbook() { let c = logConfig[logTab], rows = db[c.key].map(x => Object.fromEntries(c.fields.map(f => [f[1], x[f[0]]]))); exportRows(rows, c.title.replaceAll(' ', '_') + '.xlsx', c.title) }
 
         function salesForMonth(m) { return db.sales.filter(s => s.date.startsWith(m)) }
-        function renderRecap() {
-            let m = $('monthFilter').value || today().slice(0, 7);
-            let rows = salesForMonth(m);
-            let cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + num(s.total), 0);
-            let non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + num(s.total), 0);
-            let total = rows.reduce((a, s) => a + num(s.total), 0);
-            let profit = rows.reduce((a, s) => a + num(s.total) - num(product(s.productId)?.hpp) * num(s.qty), 0);
-            let trx = new Set(rows.map(s => s.no)).size;
 
+        function localISODate(date = new Date()) {
+            const y = date.getFullYear(), m = String(date.getMonth() + 1).padStart(2, '0'), d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        function shiftDate(date, days) {
+            const d = new Date(date + 'T00:00:00');
+            d.setDate(d.getDate() + days);
+            return localISODate(d);
+        }
+        function getRecapRange() {
+            return { from: $('recapFrom').value, to: $('recapTo').value };
+        }
+        function formatPeriodDate(value) {
+            return value ? new Date(value + 'T00:00:00').toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
+        }
+        function recapPeriodLabel(from, to) {
+            return from === to ? formatPeriodDate(from) : `${formatPeriodDate(from)} s.d. ${formatPeriodDate(to)}`;
+        }
+        function setRecapPreset(preset) {
+            const now = new Date();
+            const todayDate = localISODate(now);
+            let from = todayDate, to = todayDate;
+            if (preset === 'week') {
+                const day = now.getDay();
+                const mondayOffset = day === 0 ? -6 : 1 - day;
+                from = shiftDate(todayDate, mondayOffset);
+                to = shiftDate(from, 6);
+            } else if (preset === 'month') {
+                from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+                to = localISODate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+            } else if (preset === 'quarter') {
+                const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
+                from = localISODate(new Date(now.getFullYear(), quarterStartMonth, 1));
+                to = localISODate(new Date(now.getFullYear(), quarterStartMonth + 3, 0));
+            } else if (preset === 'semester') {
+                const semesterStartMonth = now.getMonth() < 6 ? 0 : 6;
+                from = localISODate(new Date(now.getFullYear(), semesterStartMonth, 1));
+                to = localISODate(new Date(now.getFullYear(), semesterStartMonth + 6, 0));
+            } else if (preset === 'year') {
+                from = `${now.getFullYear()}-01-01`;
+                to = `${now.getFullYear()}-12-31`;
+            } else if (preset === 'custom') {
+                $('recapPreset').value = 'custom';
+                renderRecap();
+                return;
+            }
+            $('recapPreset').value = preset;
+            $('recapFrom').value = from;
+            $('recapTo').value = to;
+            renderRecap();
+        }
+        function onRecapDateChange() {
+            $('recapPreset').value = 'custom';
+            renderRecap();
+        }
+        function renderRecap() {
+            const { from, to } = getRecapRange();
+            const validRange = from && to && from <= to;
+            const rows = validRange ? db.sales.filter(s => s.date >= from && s.date <= to) : [];
+            const cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + num(s.total), 0);
+            const non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + num(s.total), 0);
+            const total = rows.reduce((a, s) => a + num(s.total), 0);
+            const profit = rows.reduce((a, s) => a + num(s.total) - num(product(s.productId)?.hpp) * num(s.qty), 0);
+            const trx = new Set(rows.map(s => s.no)).size;
+            const periodLabel = validRange ? recapPeriodLabel(from, to) : 'Rentang tanggal tidak valid';
+
+            $('recapPeriodInfo').textContent = validRange
+                ? `Menampilkan ${rows.length.toLocaleString('id-ID')} baris transaksi untuk periode ${periodLabel}.`
+                : 'Tanggal mulai tidak boleh melewati tanggal akhir. Periksa kembali rentang tanggal.';
             $('recapCards').innerHTML =
                 statCard('Total Transaksi', trx, '▤') +
                 statCard('Omzet Tunai', rupiah(cash), '◉') +
@@ -1408,12 +1505,12 @@
                 statCard('Total Omzet', rupiah(total), '↗');
 
             $('recapTable').innerHTML = `<table><thead><tr>
-                <th>Periode</th><th>Total Transaksi</th><th>Omzet Tunai</th>
-                <th>Omzet Non-Tunai</th><th>Total Omzet</th><th>Est. Profit</th>
+                <th>Periode Laporan</th><th>Tanggal Mulai</th><th>Tanggal Akhir</th><th>Total Transaksi</th>
+                <th>Omzet Tunai</th><th>Omzet Non-Tunai</th><th>Total Omzet</th><th>Est. Profit</th>
             </tr></thead><tbody><tr>
-                <td>${esc(m)}</td><td>${trx}</td><td>${rupiah(cash)}</td>
-                <td>${rupiah(non)}</td><td><b>${rupiah(total)}</b></td>
-                <td class="positive">${rupiah(profit)}</td>
+                <td>${esc(periodLabel)}</td><td>${esc(from || '-')}</td><td>${esc(to || '-')}</td>
+                <td>${trx}</td><td>${rupiah(cash)}</td><td>${rupiah(non)}</td>
+                <td><b>${rupiah(total)}</b></td><td class="positive">${rupiah(profit)}</td>
             </tr></tbody></table>
             <div class="footer-note">Est. Profit = total penjualan − (QTY × HPP saat ini). Transaksi non-tunai mencakup QRIS, transfer, debit, dan kredit.</div>`;
 
@@ -1422,40 +1519,26 @@
                 const p = product(s.productId);
                 const key = s.productId || s.no;
                 if (!performance[key]) performance[key] = {
-                    sku: p?.sku || '-',
-                    name: p?.name || 'Barang tidak ditemukan',
-                    transactionNos: new Set(),
-                    qty: 0,
-                    revenue: 0
+                    sku: p?.sku || '-', name: p?.name || 'Barang tidak ditemukan',
+                    transactionNos: new Set(), qty: 0, revenue: 0
                 };
                 performance[key].transactionNos.add(s.no);
                 performance[key].qty += num(s.qty);
                 performance[key].revenue += num(s.total);
             });
-
-            const topProducts = Object.values(performance)
-                .sort((a, b) => b.revenue - a.revenue)
-                .slice(0, 5);
-
+            const topProducts = Object.values(performance).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
             $('topProductPerformance').innerHTML = topProducts.length ? `
-                <table>
-                    <thead><tr>
-                        <th>Produk</th><th class="right">Frekuensi Transaksi</th>
-                        <th class="right">Qty Terjual</th><th class="right">Revenue</th>
-                    </tr></thead>
-                    <tbody>${topProducts.map((p, index) => `
-                        <tr>
-                            <td><div style="display:flex;align-items:center;gap:9px">
-                                <span class="pill">${index + 1}</span>
-                                <div><b>${esc(p.name)}</b><div class="muted" style="font-size:10px">${esc(p.sku)}</div></div>
-                            </div></td>
-                            <td class="right">${p.transactionNos.size.toLocaleString('id-ID')}</td>
-                            <td class="right">${p.qty.toLocaleString('id-ID')}</td>
-                            <td class="right"><b>${rupiah(p.revenue)}</b></td>
-                        </tr>`).join('')}
-                    </tbody>
-                </table>` : '<div class="empty">Belum ada data penjualan untuk ditampilkan.</div>';
+                <table><thead><tr>
+                    <th>Produk</th><th class="right">Frekuensi Transaksi</th>
+                    <th class="right">Qty Terjual</th><th class="right">Revenue</th>
+                </tr></thead><tbody>${topProducts.map((p, index) => `
+                    <tr><td><div style="display:flex;align-items:center;gap:9px">
+                        <span class="pill">${index + 1}</span><div><b>${esc(p.name)}</b><div class="muted" style="font-size:10px">${esc(p.sku)}</div></div>
+                    </div></td><td class="right">${p.transactionNos.size.toLocaleString('id-ID')}</td>
+                    <td class="right">${p.qty.toLocaleString('id-ID')}</td><td class="right"><b>${rupiah(p.revenue)}</b></td></tr>`).join('')}
+                </tbody></table>` : '<div class="empty">Belum ada data penjualan untuk ditampilkan.</div>';
         }
+        
         function statCard(label, val, ic) { return `<div class="stat"><div class="stat-top">${label}<span class="stat-icon">${ic}</span></div><div class="stat-value">${val}</div></div>` }
         function renderDashboard() {
             let total = db.sales.reduce((a, s) => a + num(s.total), 0);
@@ -1591,20 +1674,43 @@
         }
         function exportProducts() { let rows = db.products.map(p => ({ 'Kode SKU': p.sku, Brand: p.brand, 'Nama Produk': p.name, Kategori: p.category, Satuan: p.unit, HPP: p.hpp, 'Harga Jual': p.price, 'Stock Minimal': num(p.minStock), Margin: margin(p), 'Persentase Margin': marginPct(p).toFixed(2) + '%' })); exportRows(rows, 'Master_Barang.xlsx', 'Barang') }
         function exportSales() { exportRows(db.sales.map(s => ({ 'Tanggal': s.date, 'No. Trx': s.no, 'Kode SKU': product(s.productId)?.sku || '', 'Nama Produk': product(s.productId)?.name || '', QTY: s.qty, 'Harga Satuan': s.price, Total: s.total, 'Metode Bayar': s.method })), 'Penjualan.xlsx', 'Penjualan') }
-        function exportRecap() { let m = $('monthFilter').value || today().slice(0, 7), rows = salesForMonth(m), cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + s.total, 0), non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + s.total, 0), total = rows.reduce((a, s) => a + s.total, 0), profit = rows.reduce((a, s) => a + s.total - (product(s.productId)?.hpp || 0) * s.qty, 0); exportRows([{ 'Periode': m, 'Total Transaksi': new Set(rows.map(s => s.no)).size, 'Omzet Tunai': cash, 'Omzet Non-Tunai': non, 'Total Omzet': total, 'Est. Profit': profit }], 'Rekap_Bulanan.xlsx', 'Rekap') }
+        function exportRecap() {
+            const { from, to } = getRecapRange();
+            if (!from || !to || from > to) return showToast('Periksa tanggal mulai dan tanggal akhir.', 'info', 'Rentang tanggal tidak valid');
+            const rows = db.sales.filter(s => s.date >= from && s.date <= to);
+            const cash = rows.filter(s => s.method === 'Tunai').reduce((a, s) => a + num(s.total), 0);
+            const non = rows.filter(s => s.method !== 'Tunai').reduce((a, s) => a + num(s.total), 0);
+            const total = rows.reduce((a, s) => a + num(s.total), 0);
+            const profit = rows.reduce((a, s) => a + num(s.total) - num(product(s.productId)?.hpp) * num(s.qty), 0);
+            const summary = [{
+                'Tanggal Mulai': from, 'Tanggal Akhir': to, 'Periode': recapPeriodLabel(from, to),
+                'Total Transaksi': new Set(rows.map(s => s.no)).size,
+                'Total Item Terjual': rows.reduce((a, s) => a + num(s.qty), 0),
+                'Omzet Tunai': cash, 'Omzet Non-Tunai': non, 'Total Omzet': total, 'Est. Profit': profit
+            }];
+            const details = rows.map(s => {
+                const p = product(s.productId);
+                return { Tanggal: s.date, 'No. Transaksi': s.no, 'Kode SKU': p?.sku || '-',
+                    'Nama Barang': p?.name || 'Barang tidak ditemukan', Qty: num(s.qty),
+                    'Harga Satuan': num(s.price), 'Metode Pembayaran': s.method || '-', Total: num(s.total) };
+            });
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), 'Ringkasan');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(details), 'Detail Transaksi');
+            XLSX.writeFile(wb, `Rekap_Penjualan_${from}_${to}.xlsx`);
+        }
 
         function exportRecapPDF() {
-            const period = $('monthFilter').value || today().slice(0, 7);
-            const rows = salesForMonth(period).slice().sort((a, b) =>
+            const { from, to } = getRecapRange();
+            if (!from || !to || from > to) return showToast('Periksa tanggal mulai dan tanggal akhir.', 'info', 'Rentang tanggal tidak valid');
+            const rows = db.sales.filter(s => s.date >= from && s.date <= to).slice().sort((a, b) =>
                 a.date.localeCompare(b.date) || String(a.no).localeCompare(String(b.no))
             );
             const fmt = value => rupiah(value);
             const fmtDate = value => value ? new Date(value + 'T00:00:00').toLocaleDateString('id-ID', {
                 day: '2-digit', month: 'long', year: 'numeric'
             }) : '-';
-            const monthLabel = new Date(period + '-01T00:00:00').toLocaleDateString('id-ID', {
-                month: 'long', year: 'numeric'
-            });
+            const periodLabel = recapPeriodLabel(from, to);
             const total = rows.reduce((sum, s) => sum + num(s.total), 0);
             const cash = rows.filter(s => s.method === 'Tunai').reduce((sum, s) => sum + num(s.total), 0);
             const nonCash = total - cash;
@@ -1668,7 +1774,7 @@
             const detailHtml = rows.length ? rows.map(s => {
                 const p = product(s.productId);
                 return `<tr><td>${fmtDate(s.date)}</td><td>${escPdf(s.no)}</td><td>${escPdf(p?.sku || '-')}</td><td>${escPdf(p?.name || 'Barang tidak ditemukan')}</td><td class="num">${num(s.qty)}</td><td class="num">${fmt(s.price)}</td><td>${escPdf(s.method || '-')}</td><td class="num">${fmt(s.total)}</td></tr>`;
-            }).join('') : '<tr><td colspan="8" class="empty">Belum ada transaksi penjualan pada bulan ini.</td></tr>';
+            }).join('') : '<tr><td colspan="8" class="empty">Belum ada transaksi penjualan pada periode ini.</td></tr>';
 
             const reportWindow = window.open('', '_blank');
             if (!reportWindow) {
@@ -1678,7 +1784,7 @@
             const generatedAt = new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
             reportWindow.document.open();
             reportWindow.document.write(`<!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><title>Rekap Bulanan KDKMP - ${escPdf(period)}</title>
+<html lang="id"><head><meta charset="UTF-8"><title>Rekap Penjualan KDKMP - ${escPdf(from)} - ${escPdf(to)}</title>
 <style>
     @page { size: A4 landscape; margin: 18mm 20mm; }
     * { box-sizing: border-box; }
@@ -1771,7 +1877,7 @@
 <main class="report-content">
 <div class="header">
   <div><div class="brand">KDKMP</div><div class="subtitle">INVENTORY &amp; SALES SYSTEM · LAPORAN MANAJEMEN</div><div class="report-tag">REKAP PENJUALAN BULANAN</div></div>
-  <div class="period"><b>PERIODE LAPORAN</b><br><strong style="font-size:15px;color:#fff">${escPdf(monthLabel)}</strong><br>Dicetak: ${escPdf(generatedAt)}</div>
+  <div class="period"><b>PERIODE LAPORAN</b><br><strong style="font-size:15px;color:#fff">${escPdf(periodLabel)}</strong><br>Dicetak: ${escPdf(generatedAt)}</div>
 </div>
 <div class="section-kicker">Executive summary · Ringkasan kinerja</div>
 <div class="cards">
@@ -1808,7 +1914,7 @@
 • Tunai dihitung dari transaksi dengan metode pembayaran “Tunai”; non-tunai mencakup metode pembayaran selain Tunai yang tercatat pada transaksi.<br>
 • Estimasi HPP dan laba kotor menggunakan HPP yang saat ini tersimpan pada Master Data Barang (bukan histori HPP pada tanggal transaksi).<br>
 • Estimasi laba kotor = total omzet − estimasi HPP. Angka ini belum memperhitungkan biaya operasional, pajak, diskon, atau beban lainnya.<br>
-• Laporan disusun berdasarkan transaksi penjualan yang tersimpan pada aplikasi untuk periode ${escPdf(monthLabel)}.
+• Laporan disusun berdasarkan transaksi penjualan yang tersimpan pada aplikasi untuk periode ${escPdf(periodLabel)}.
 </div>
 <div class="signature"><div>Disusun oleh,<div class="line">Administrator KDKMP</div></div><div>Mengetahui,<div class="line">________________________</div></div></div>
 <div class="footer"><span>KDKMP · Inventory &amp; Sales System</span><span>Dokumen dibuat otomatis · ${escPdf(generatedAt)}</span></div>
@@ -1819,7 +1925,7 @@
 
         function exportRows(rows, file, sheet) { if (!rows.length) return alert('Tidak ada data untuk diekspor.'); let ws = XLSX.utils.json_to_sheet(rows), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheet); XLSX.writeFile(wb, file) }
         function exportCSV() { let rows = db.products.map(p => [p.sku, p.brand, p.name, p.category, p.unit, p.hpp, p.price, num(p.minStock), margin(p), marginPct(p)]), csv = [['Kode SKU', 'Brand', 'Nama Produk', 'Kategori', 'Satuan', 'HPP', 'Harga Jual', 'Stock Minimal', 'Margin', 'Persentase Margin'], ...rows].map(r => r.join(';')).join('\n'); let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })); a.download = 'Master_Barang.csv'; a.click() }
-        $('today').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); $('monthFilter').value = today().slice(0, 7); renderAll();
+        $('today').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); setRecapPreset('month'); renderAll();
     </script>
 </body>
 
