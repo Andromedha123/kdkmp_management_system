@@ -1469,23 +1469,152 @@
                 }
             );
         }
-        function openSale() { if (!db.products.length) return alert('Tambahkan master barang terlebih dahulu.'); let opts = db.products.map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)} (${rupiah(p.price)})</option>`).join(''); modal('Input Penjualan Harian', `<div class="formgrid">${field('Tanggal', 'sDate', today(), 'date')}${field('No. Transaksi', 'sNo', 'TRX-' + Date.now().toString().slice(-6))}${selectRaw('Nama Barang', 'sProduct', opts)}${field('QTY', 'sQty', 1, 'number', 'min="1"')}${field('Harga Satuan (otomatis)', 'sPrice', db.products[0].price, 'number', 'min="0"')}${field('Total', 'sTotal', rupiah(db.products[0].price))}${selectField('Metode Bayar', 'sMethod', ['Tunai', 'QRIS', 'Transfer', 'Debit', 'Kredit'])}</div><div class="notice">Harga satuan otomatis mengikuti Harga Jual di Master Data Barang.</div>`, 'Simpan Transaksi', () => { let p = product($('sProduct').value), qty = num($('sQty').value); if (!p || qty <= 0) return alert('Pilih barang dan isi QTY lebih dari 0.'); if (stockOf(p.id) < qty && !confirm('Stok sistem kurang dari jumlah penjualan. Tetap simpan?')) return; let sale = { id: uid(), date: $('sDate').value, no: $('sNo').value, productId: p.id, qty, price: num($('sPrice').value), total: qty * num($('sPrice').value), method: $('sMethod').value }; db.sales.push(sale); addMovement(p.id, sale.date, 0, qty, 'Penjualan ' + sale.no, sale.no); save(); closeModal() }); setTimeout(() => { let update = () => { let p = product($('sProduct').value); $('sPrice').value = p?.price || 0; $('sTotal').value = rupiah(num($('sQty').value) * num($('sPrice').value)) }; $('sProduct').onchange = update; $('sQty').oninput = update; $('sPrice').oninput = update }, 0) }
-        function renderSales() { let q = ($('saleSearch')?.value || '').toLowerCase(), d = $('saleDate')?.value || '', rows = db.sales.filter(s => { let p = product(s.productId); return (s.no + ' ' + (p?.name || '')).toLowerCase().includes(q) && (!d || s.date === d) }).slice().reverse(); $('salesTable').innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>No. Trx</th><th>Nama Barang</th><th>QTY</th><th>Harga Satuan</th><th>Total</th><th>Metode Bayar</th><th>Aksi</th></tr></thead><tbody>${rows.map(s => { let p = product(s.productId); return `<tr><td>${s.date}</td><td><b>${esc(s.no)}</b></td><td>${esc(p?.name || 'Barang dihapus')}</td><td>${s.qty}</td><td>${rupiah(s.price)}</td><td><b>${rupiah(s.total)}</b></td><td><span class="pill ${s.method === 'Tunai' ? 'green' : s.method === 'Bon' ? 'amber' : ''}">${esc(s.method)}</span></td><td><button class="action" onclick="deleteSale('${s.id}')">Hapus</button></td></tr>` }).join('')}</tbody></table>` : '<div class="empty">Belum ada transaksi penjualan.</div>' }
-        function deleteSale(id) {
-            let s = db.sales.find(x => x.id === id);
-            if (!s) return;
+        function saleItemRow(index) {
+            const options = db.products.map(p => `<option value="${p.id}" ${index === 0 && p.id === db.products[0]?.id ? 'selected' : ''}>${esc(p.sku)} — ${esc(p.name)}</option>`).join('');
+            const first = db.products[0];
+            return `<tr class="sale-item-row" data-index="${index}">
+                <td style="min-width:210px"><select class="sale-product" onchange="updateSaleItemRow(this)">${options}</select></td>
+                <td style="min-width:85px"><input class="sale-qty" type="number" min="1" value="1" oninput="updateSaleItemRow(this)"></td>
+                <td style="min-width:130px"><input class="sale-price" type="number" min="0" value="${num(first?.price)}" oninput="updateSaleItemRow(this)"></td>
+                <td class="sale-line-total" style="font-weight:700">${rupiah(first?.price || 0)}</td>
+                <td><button type="button" class="action" onclick="removeSaleItemRow(this)">Hapus</button></td>
+            </tr>`;
+        }
+        function addSaleItemRow() {
+            const body = $('saleItemsBody');
+            if (!body) return;
+            const index = body.querySelectorAll('tr').length;
+            body.insertAdjacentHTML('beforeend', saleItemRow(index));
+            updateSaleGrandTotal();
+        }
+        function removeSaleItemRow(button) {
+            const body = $('saleItemsBody');
+            if (body.querySelectorAll('tr').length <= 1) return showToast('Minimal satu barang harus ada dalam transaksi.', 'info');
+            button.closest('tr').remove();
+            updateSaleGrandTotal();
+        }
+        function updateSaleItemRow(element) {
+            const row = element.closest('tr');
+            const p = product(row.querySelector('.sale-product').value);
+            const priceInput = row.querySelector('.sale-price');
+            if (element.classList.contains('sale-product')) priceInput.value = p?.price || 0;
+            const qty = Math.max(0, num(row.querySelector('.sale-qty').value));
+            row.querySelector('.sale-line-total').textContent = rupiah(qty * num(priceInput.value));
+            updateSaleGrandTotal();
+        }
+        function updateSaleGrandTotal() {
+            const rows = [...($('saleItemsBody')?.querySelectorAll('tr') || [])];
+            const total = rows.reduce((sum, row) => sum + num(row.querySelector('.sale-qty').value) * num(row.querySelector('.sale-price').value), 0);
+            if ($('saleGrandTotal')) $('saleGrandTotal').textContent = rupiah(total);
+            if ($('saleItemCount')) $('saleItemCount').textContent = `${rows.length} jenis barang`;
+        }
+        function openSale() {
+            if (!db.products.length) return alert('Tambahkan master barang terlebih dahulu.');
+            modal('Input Penjualan Harian', `
+                <div class="formgrid">
+                    ${field('Tanggal', 'sDate', today(), 'date')}
+                    ${field('No. Transaksi', 'sNo', 'TRX-' + Date.now().toString().slice(-6))}
+                    ${selectField('Metode Bayar', 'sMethod', ['Tunai', 'QRIS', 'Transfer', 'Debit', 'Kredit'])}
+                </div>
+                <div class="panel" style="padding:14px;margin:16px 0 10px;box-shadow:none">
+                    <div class="panel-head">
+                        <div><h3>Daftar Barang</h3><div class="sub">Tambahkan satu atau beberapa barang dalam transaksi yang sama.</div></div>
+                        <button type="button" class="btn primary" onclick="addSaleItemRow()">＋ Tambah Barang</button>
+                    </div>
+                    <div class="table-wrap"><table>
+                        <thead><tr><th>Nama Barang</th><th>QTY</th><th>Harga Satuan</th><th>Total</th><th>Aksi</th></tr></thead>
+                        <tbody id="saleItemsBody">${saleItemRow(0)}</tbody>
+                    </table></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:15px;margin-top:10px;border-top:1px solid var(--line)">
+                        <span class="muted" id="saleItemCount">1 jenis barang</span>
+                        <div style="text-align:right"><div class="muted" style="font-size:11px">TOTAL TRANSAKSI</div><b id="saleGrandTotal" style="font:800 20px Manrope">${rupiah(db.products[0].price)}</b></div>
+                    </div>
+                </div>
+                <div class="notice">Harga satuan otomatis mengikuti Harga Jual di Master Data Barang. Anda dapat mengubah harga sebelum menyimpan. Stok akan berkurang untuk setiap barang yang dijual.</div>
+            `, 'Simpan Transaksi', () => {
+                const date = $('sDate').value, no = $('sNo').value.trim(), method = $('sMethod').value;
+                const rows = [...$('saleItemsBody').querySelectorAll('tr')];
+                if (!date || !no || !rows.length) return showToast('Tanggal dan nomor transaksi wajib diisi.', 'info');
+                const items = rows.map(row => ({
+                    p: product(row.querySelector('.sale-product').value),
+                    qty: num(row.querySelector('.sale-qty').value),
+                    price: num(row.querySelector('.sale-price').value)
+                }));
+                if (items.some(x => !x.p || x.qty <= 0 || x.price < 0)) return showToast('Periksa kembali barang, QTY, dan harga satuan.', 'info');
+                const duplicate = db.sales.some(x => x.no === no);
+                if (duplicate) return showToast('Nomor transaksi sudah digunakan. Gunakan nomor transaksi lain.', 'info');
+                const qtyByProduct = {};
+                items.forEach(x => qtyByProduct[x.p.id] = (qtyByProduct[x.p.id] || 0) + x.qty);
+                const insufficient = Object.entries(qtyByProduct).filter(([id, qty]) => stockOf(id) < qty);
+                if (insufficient.length && !confirm('Stok sistem kurang untuk satu atau beberapa barang. Tetap simpan transaksi?')) return;
+                items.forEach(x => {
+                    const sale = { id: uid(), date, no, productId: x.p.id, qty: x.qty, price: x.price, total: x.qty * x.price, method };
+                    db.sales.push(sale);
+                    addMovement(x.p.id, date, 0, x.qty, 'Penjualan ' + no, no);
+                });
+                save(); closeModal();
+                showToast(`${items.length} jenis barang berhasil disimpan dalam transaksi ${no}.`, 'success');
+            });
+            updateSaleGrandTotal();
+        }
+        function saleGroups() {
+            const groups = new Map();
+            db.sales.forEach(s => {
+                const key = `${s.date}__${s.no}`;
+                if (!groups.has(key)) groups.set(key, { date: s.date, no: s.no, method: s.method, items: [], total: 0, qty: 0 });
+                const g = groups.get(key);
+                g.items.push(s); g.total += num(s.total); g.qty += num(s.qty);
+            });
+            return [...groups.values()];
+        }
+        function showSaleDetail(date, no) {
+            const items = db.sales.filter(s => s.date === date && s.no === no);
+            if (!items.length) return;
+            const total = items.reduce((a, s) => a + num(s.total), 0);
+            const qty = items.reduce((a, s) => a + num(s.qty), 0);
+            modal('Rincian Transaksi ' + no, `
+                <div class="formgrid" style="margin-bottom:15px">
+                    <div><div class="muted">Tanggal</div><b>${esc(date)}</b></div>
+                    <div><div class="muted">Metode Bayar</div><b>${esc(items[0].method || '-')}</b></div>
+                </div>
+                <div class="table-wrap"><table>
+                    <thead><tr><th>SKU</th><th>Nama Barang</th><th>QTY</th><th>Harga Satuan</th><th>Total</th></tr></thead>
+                    <tbody>${items.map(s => { const p = product(s.productId); return `<tr><td>${esc(p?.sku || '-')}</td><td>${esc(p?.name || 'Barang dihapus')}</td><td>${num(s.qty)}</td><td>${rupiah(s.price)}</td><td><b>${rupiah(s.total)}</b></td></tr>`; }).join('')}</tbody>
+                </table></div>
+                <div style="display:flex;justify-content:space-between;padding-top:15px;margin-top:10px;border-top:1px solid var(--line)">
+                    <div><div class="muted">Jumlah jenis barang: ${items.length}</div><div class="muted">Total kuantitas: ${qty}</div></div>
+                    <div style="text-align:right"><div class="muted">TOTAL TRANSAKSI</div><b style="font:800 20px Manrope">${rupiah(total)}</b></div>
+                </div>
+            `, 'Tutup', closeModal);
+            $('modalActions').innerHTML = '<button class="btn primary" onclick="closeModal()">Tutup</button>';
+        }
+        function renderSales() {
+            const q = ($('saleSearch')?.value || '').toLowerCase(), d = $('saleDate')?.value || '';
+            const rows = saleGroups().filter(g => {
+                const names = g.items.map(s => { const p = product(s.productId); return `${p?.sku || ''} ${p?.name || ''}`; }).join(' ');
+                return (`${g.no} ${names}`).toLowerCase().includes(q) && (!d || g.date === d);
+            }).reverse();
+            $('salesTable').innerHTML = rows.length ? `<table><thead><tr><th>Tanggal</th><th>No. Trx</th><th>Jumlah Barang</th><th>Total QTY</th><th>Total Transaksi</th><th>Metode Bayar</th><th>Aksi</th></tr></thead><tbody>${rows.map(g => `<tr>
+                <td>${esc(g.date)}</td><td><b>${esc(g.no)}</b></td><td>${g.items.length} jenis</td><td>${g.qty}</td>
+                <td><b>${rupiah(g.total)}</b></td><td><span class="pill ${g.method === 'Tunai' ? 'green' : ''}">${esc(g.method || '-')}</span></td>
+                <td><div class="actions"><button class="action" onclick="showSaleDetail('${esc(g.date)}','${esc(g.no)}')">Rincian</button><button class="action" onclick="deleteSale('${esc(g.date)}','${esc(g.no)}')">Hapus</button></div></td>
+            </tr>`).join('')}</tbody></table>` : '<div class="empty">Belum ada transaksi penjualan.</div>';
+        }
+        function deleteSale(date, no) {
+            const items = db.sales.filter(x => x.date === date && x.no === no);
+            if (!items.length) return;
             showDeleteConfirmation(
-                'Anda akan menghapus transaksi penjualan ' + s.no + '.',
-                'Mutasi barang keluar yang terkait juga akan dihapus sehingga stok barang dikembalikan. Laporan penjualan akan diperbarui.',
+                'Anda akan menghapus transaksi penjualan ' + no + '.',
+                `${items.length} baris barang dalam transaksi ini akan dihapus. Mutasi stok keluar terkait juga akan dihapus sehingga stok dikembalikan.`,
                 () => {
-                    db.sales = db.sales.filter(x => x.id !== id);
-                    let m = db.movements.find(x => x.ref === s.no && x.desc === 'Penjualan ' + s.no);
-                    if (m) db.movements = db.movements.filter(x => x.id !== m.id);
+                    db.sales = db.sales.filter(x => !(x.date === date && x.no === no));
+                    db.movements = db.movements.filter(x => !(x.ref === no && x.desc === 'Penjualan ' + no && x.date === date));
                     save();
-                    showToast('Transaksi dan mutasi stok terkait berhasil dihapus.', 'success', 'Data berhasil dihapus');
+                    showToast('Transaksi beserta seluruh rincian barang dan mutasi stok berhasil dihapus.', 'success', 'Data berhasil dihapus');
                 }
             );
         }
+
 
         let logTab = 'log';
         const logConfig = {
